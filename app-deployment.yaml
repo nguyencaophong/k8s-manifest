@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techinsight-api
+  namespace: techinsight
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: techinsight-api
+  template:
+    metadata:
+      labels:
+        app: techinsight-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: techinsight-api
+        image: lifegoeson34/techinsight-api:v1.0.0
+        imagePullPolicy: Always 
+        ports: 
+          - containerPort: 8080
