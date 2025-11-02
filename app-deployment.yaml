@@ -14,11 +14,9 @@ spec:
       labels:
         app: techinsight-api
     spec:
-      imagePullSecrets:
-        - name: regcred
       containers:
       - name: techinsight-api
-        image: lifegoeson34/techinsight-api:v1.0.f95188e
+        image: lifegoeson34/techinsight-api:latest
         imagePullPolicy: Always 
         ports: 
           - containerPort: 8080
