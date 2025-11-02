@@ -3,16 +3,11 @@ kind: Application
 metadata:
   name: argocd
   namespace: argocd
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: techinsight-api=lifegoeson34/techinsight-api
-    argocd-image-updater.argoproj.io/techinsight-api.update-strategy: semver
-    argocd-image-updater.argoproj.io/techinsight-api.allow-tags: regexp:^v?[0-9]+\.[0-9]+\.[0-9]+$
-    argocd-image-updater.argoproj.io/write-back-method: git
 
 spec:
   project: default
   source:
-    repoURL: https://github.com/nguyencaophong/TechInsighApiV2
+    repoURL: https://github.com/nguyencaophong/k8s-manifest
     path: .
     targetRevision: HEAD 
 
