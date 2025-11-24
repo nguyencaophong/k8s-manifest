@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: techinsight-api
-        image: lifegoeson34/techinsight-api:v1.0.b03e4cb
+        image: lifegoeson34/techinsight-api:v1.0.ee90b37
         imagePullPolicy: Always 
         ports: 
           - containerPort: 8080
