@@ -11,8 +11,7 @@ metadata:
 spec:
   project: default
   source:
-    # Sửa thành URL repo Git của bạn (ví dụ https://github.com/YOUR_ORG/techinsight.git)
-    repoURL: https://github.com/YOUR_ORG/techinsight.git
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
     path: k8s
     directory:
