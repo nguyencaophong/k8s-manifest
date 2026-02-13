@@ -7,9 +7,8 @@ metadata:
   namespace: techinsight
   annotations:
     konghq.com/strip-path: "false"
-    # Lower priority so cert-manager HTTP-01 solver (/.well-known/acme-challenge/) is matched first
-    konghq.com/regex-priority: "-1"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    acme.cert-manager.io/http01-edit-in-place: "true"
 spec:
   ingressClassName: kong
   tls:

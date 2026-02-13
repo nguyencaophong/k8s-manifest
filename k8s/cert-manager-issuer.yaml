@@ -12,8 +12,3 @@ spec:
       - http01:
           ingress:
             ingressClassName: kong
-            ingressTemplate:
-              metadata:
-                annotations:
-                  # Higher priority so ACME challenge route is matched before main app ingress
-                  konghq.com/regex-priority: "100"
