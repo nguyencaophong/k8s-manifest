@@ -1,21 +1,19 @@
-# Argo CD Application: Auth Service
-# Sửa spec.source.repoURL nếu repo khác.
-# Apply: kubectl apply -f k8s/argocd/application-auth-service.yaml
+# ArgoCD Application: Backend Worker Service
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: be-techinsights-auth
+  name: techinsight-be-worker-service
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: techinsight
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/nguyencaophong/be-techinsights-auth-service.git
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s
-    directory:
-      recurse: false
+    path: k8s/apps/be-worker-service
   destination:
     server: https://kubernetes.default.svc
     namespace: techinsight
@@ -23,4 +21,3 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - PruneLast=true
-    # automated: {}

@@ -1,0 +1,54 @@
+# Consul Template: config from Consul KV + secrets from Vault -> merged.env (production pattern).
+# Template 1: config.yml (static from Consul). Template 2: merged.env (Consul key + Vault secret).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-templates
+  namespace: techinsight
+data:
+  # Static config only (no secrets)
+  be-api-service.tpl: |
+    {{ key "techinsight/config/be-api-service" }}
+  be-worker-service.tpl: |
+    {{ key "techinsight/config/be-worker-service" }}
+  be-auth-service.tpl: |
+    {{ key "techinsight/config/be-auth-service" }}
+  # Merged env: config tĩnh (Consul) + secret (Vault) -> 1 file
+  be-api-service-env.tpl: |
+    # DB config: host/port from Consul, user/pass from Vault
+    export DB_HOST="{{ key "techinsight/config/db/host" }}"
+    export DB_PORT="{{ key "techinsight/config/db/port" }}"
+    {{ with secret "secret/data/techinsight/db" }}
+    export DB_USER="{{ .Data.data.username }}"
+    export DB_PASS="{{ .Data.data.password }}"
+    {{ end }}
+    # Service secrets from Vault
+    {{ with secret "secret/data/techinsight/be-api-service" }}
+    {{ range $k, $v := .Data.data }}
+    export {{ $k }}="{{ $v }}"
+    {{ end }}
+    {{ end }}
+  be-worker-service-env.tpl: |
+    export DB_HOST="{{ key "techinsight/config/db/host" }}"
+    export DB_PORT="{{ key "techinsight/config/db/port" }}"
+    {{ with secret "secret/data/techinsight/db" }}
+    export DB_USER="{{ .Data.data.username }}"
+    export DB_PASS="{{ .Data.data.password }}"
+    {{ end }}
+    {{ with secret "secret/data/techinsight/be-worker-service" }}
+    {{ range $k, $v := .Data.data }}
+    export {{ $k }}="{{ $v }}"
+    {{ end }}
+    {{ end }}
+  be-auth-service-env.tpl: |
+    export DB_HOST="{{ key "techinsight/config/db/host" }}"
+    export DB_PORT="{{ key "techinsight/config/db/port" }}"
+    {{ with secret "secret/data/techinsight/db" }}
+    export DB_USER="{{ .Data.data.username }}"
+    export DB_PASS="{{ .Data.data.password }}"
+    {{ end }}
+    {{ with secret "secret/data/techinsight/be-auth-service" }}
+    {{ range $k, $v := .Data.data }}
+    export {{ $k }}="{{ $v }}"
+    {{ end }}
+    {{ end }}

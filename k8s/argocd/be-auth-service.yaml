@@ -1,21 +1,19 @@
-# Argo CD Application: Frontend (FE) Service
-# Sửa spec.source.repoURL nếu repo khác.
-# Apply: kubectl apply -f k8s/argocd/application-fe.yaml
+# ArgoCD Application: Backend Auth Service (gRPC)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: fe-techinsight
+  name: techinsight-be-auth-service
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: techinsight
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/nguyencaophong/fe-techinsight.git
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s
-    directory:
-      recurse: false
+    path: k8s/apps/be-auth-service
   destination:
     server: https://kubernetes.default.svc
     namespace: techinsight
@@ -23,4 +21,3 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - PruneLast=true
-    # automated: {}

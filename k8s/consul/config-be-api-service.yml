@@ -1,5 +1,5 @@
-# Config for be-api-service (environment). Secrets come from Vault env.
-# Load into Consul: consul kv put techinsight/config/be-api-service @config-be-api-service.yml
+# Config be-api-service — CHỈ non-secret. Secret (JWT, DB, Redis, MinIO, ...) lấy từ Vault (env).
+# Load: consul kv put techinsight/config/be-api-service @config-be-api-service.yml
 app:
   name: "TechInsight API"
   version: "1.0.0"
@@ -28,7 +28,6 @@ server:
     burst: 50
 database:
   mongodb:
-    uri: "mongodb://mongo1:27017/techinsight?replicaSet=rs0"
     database: "techinsight"
     timeout: 10s
     max_pool_size: 100
@@ -36,7 +35,6 @@ database:
 cache:
   redis:
     addr: "redis:6379"
-    password: ""
     db: 0
     pool_size: 10
 kafka:
@@ -59,7 +57,6 @@ auth:
     addr: "be-auth-service:50051"
 security:
   jwt:
-    secret: "techinsight-prod-jwt-secret-2026-change-me"
     expiration: "24h"
     refresh_expiration: "168h"
     issuer: "techinsight-api"
@@ -76,8 +73,6 @@ external:
       use_ssl: false
       bucket_name: "techinsight"
       public_url: "https://minio.techinsightsworld.com"
-      access_key: "minioadmin"
-      secret_key: "minioadmin123"
 storage:
   provider: "minio"
   minio:
@@ -85,5 +80,3 @@ storage:
     use_ssl: false
     bucket_name: "techinsight"
     public_url: "https://minio.techinsightsworld.com"
-    access_key: "minioadmin"
-    secret_key: "minioadmin123"

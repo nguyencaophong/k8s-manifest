@@ -1,21 +1,19 @@
-# Argo CD Application: Notification Service
-# Sửa spec.source.repoURL nếu repo khác.
-# Apply: kubectl apply -f k8s/argocd/application-notification-service.yaml
+# ArgoCD Application: Infrastructure (MongoDB, Redis, Kafka, MinIO, Elasticsearch, Kibana, Grafana, Prometheus, OTel, Redpanda Console)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: be-techinsights-notification
+  name: techinsight-infra
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: techinsight
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/nguyencaophong/be-techinsights-notification-service.git
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s
-    directory:
-      recurse: false
+    path: k8s/infra
   destination:
     server: https://kubernetes.default.svc
     namespace: techinsight
@@ -23,4 +21,3 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - PruneLast=true
-    # automated: {}

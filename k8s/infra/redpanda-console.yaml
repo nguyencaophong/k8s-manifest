@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redpanda-console
+  namespace: techinsight
+  labels:
+    app: redpanda-console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redpanda-console
+  template:
+    metadata:
+      labels:
+        app: redpanda-console
+    spec:
+      containers:
+        - name: console
+          image: docker.redpanda.com/redpandadata/console:v2.5.1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CONFIG_FILEPATH
+              value: /tmp/config.yml
+            - name: CONSOLE_CONFIG_FILE
+              value: |
+                kafka:
+                  brokers: ["techinsight-kafka-kafka-bootstrap:9092"]
+          command:
+            - /bin/sh
+            - -c
+            - 'echo "$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /admin/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /admin/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redpanda-console
+  namespace: techinsight
+spec:
+  selector:
+    app: redpanda-console
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP

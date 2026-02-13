@@ -1,11 +1,11 @@
-# Argo CD Application: đồng bộ / visualize TechInsight từ Git.
-# Trước khi apply: sửa spec.source.repoURL (và targetRevision nếu cần).
-# Apply: kubectl apply -f techinsight-application.yaml
+# ArgoCD Application: Frontend Admin Service
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: techinsight
+  name: techinsight-fe-admin-service
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: techinsight
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -13,9 +13,7 @@ spec:
   source:
     repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s
-    directory:
-      recurse: false
+    path: k8s/apps/fe-admin-service
   destination:
     server: https://kubernetes.default.svc
     namespace: techinsight
@@ -23,5 +21,3 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - PruneLast=true
-    # Bỏ comment automated: {} nếu muốn Argo CD tự sync từ Git
-    # automated: {}

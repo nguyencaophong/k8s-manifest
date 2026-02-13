@@ -1,0 +1,30 @@
+# Root Application (App of Apps pattern)
+# App này quản lý tất cả các ArgoCD Application con trong folder k8s/argocd/
+# Mỗi file .yaml trong k8s/argocd/ tương ứng 1 ô trên ArgoCD UI
+#
+# Apply: kubectl apply -f k8s/argocd/root-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: techinsight-root
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: techinsight
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
+    targetRevision: HEAD
+    path: k8s/argocd
+    directory:
+      recurse: false
+      exclude: '{install-argocd.sh,scale-argocd-server.sh,README.md,root-app.yaml}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: be-worker-service
+  name: be-api-service
   namespace: techinsight
   labels:
-    app: be-worker-service
+    app: be-api-service
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: be-worker-service
+      app: be-api-service
   template:
     metadata:
       labels:
-        app: be-worker-service
+        app: be-api-service
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
@@ -21,16 +21,10 @@ spec:
         vault.hashicorp.com/agent-limits-cpu: "100m"
         vault.hashicorp.com/agent-requests-mem: "32Mi"
         vault.hashicorp.com/agent-limits-mem: "64Mi"
-        vault.hashicorp.com/role: "be-worker-service"
-        vault.hashicorp.com/agent-inject-secret-config: "secret/data/techinsight/be-worker-service"
-        vault.hashicorp.com/agent-inject-template-config: |
-          {{- with secret "secret/data/techinsight/be-worker-service" -}}
-          {{ range $k, $v := .Data.data }}
-          export {{ $k }}="{{ $v }}"
-          {{ end }}
-          {{- end -}}
+        vault.hashicorp.com/role: "be-api-service"
+        vault.hashicorp.com/agent-inject-token: "true"
     spec:
-      serviceAccountName: be-worker-service
+      serviceAccountName: be-api-service
       initContainers:
         - name: consul-template
           image: hashicorp/consul-template:0.37.6
@@ -44,6 +38,8 @@ spec:
           env:
             - name: CONSUL_HTTP_ADDR
               value: "http://consul-server.consul.svc.cluster.local:8500"
+            - name: VAULT_ADDR
+              value: "http://vault.vault.svc.cluster.local:8200"
           volumeMounts:
             - name: config-output
               mountPath: /app/configs
@@ -54,12 +50,11 @@ spec:
             - /bin/sh
             - -c
             - |
-              set -a
-              . /vault/secrets/config 2>/dev/null || true
-              set +a
-              consul-template -template "/tpl/be-worker-service.tpl:/app/configs/config.yml" -once
+              export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
+              if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); fi
+              consul-template -template "/tpl/be-api-service.tpl:/app/configs/config.yml" -template "/tpl/be-api-service-env.tpl:/app/configs/merged.env" -once
       containers:
-        - name: worker
+        - name: api
           image: lifegoeson34/techinsight-api:latest
           resources:
             requests:
@@ -68,21 +63,28 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
-          command: ["/bin/sh", "-c", "set -a; . /vault/secrets/config 2>/dev/null || true; set +a; exec ./worker"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AUTH_GRPC_ADDR
+              value: "be-auth-service:50051"
           volumeMounts:
             - name: config-output
               mountPath: /app/configs
               readOnly: true
+          command: ["/bin/sh", "-c", "set -a; . /app/configs/merged.env 2>/dev/null || true; set +a; exec ./main"]
           livenessProbe:
-            exec:
-              command: ["sh", "-c", "test -f /app/configs/config.yml"]
-            initialDelaySeconds: 15
-            periodSeconds: 20
-          readinessProbe:
-            exec:
-              command: ["sh", "-c", "test -f /app/configs/config.yml"]
-            initialDelaySeconds: 5
+            httpGet:
+              path: /metrics/health
+              port: 8080
+            initialDelaySeconds: 10
             periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /metrics/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: config-output
           emptyDir: {}
@@ -90,17 +92,19 @@ spec:
           configMap:
             name: consul-templates
             items:
-              - key: be-worker-service.tpl
-                path: be-worker-service.tpl
+              - key: be-api-service.tpl
+                path: be-api-service.tpl
+              - key: be-api-service-env.tpl
+                path: be-api-service-env.tpl
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: be-worker-service
+  name: be-api-service
   namespace: techinsight
 spec:
   selector:
-    app: be-worker-service
+    app: be-api-service
   ports:
     - port: 8080
       targetPort: 8080

@@ -8,13 +8,13 @@ metadata:
   annotations:
     konghq.com/strip-path: "false"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    acme.cert-manager.io/http01-edit-in-place: "true"
 spec:
   ingressClassName: kong
   tls:
     - hosts:
         - api.techinsightsworld.com
         - admin.techinsightsworld.com
+        - minio.techinsightsworld.com
       secretName: techinsight-api-tls
     - hosts:
         - techinsightsworld.com
@@ -61,3 +61,13 @@ spec:
                 name: fe-admin-service
                 port:
                   number: 3000
+    - host: minio.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio
+                port:
+                  number: 9000
