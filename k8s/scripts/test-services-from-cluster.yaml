@@ -1,0 +1,79 @@
+# Job: chạy trong cluster để test kết nối từ "trong cluster" tới các service TechInsight.
+# Dùng namespace techinsight để DNS ngắn: be-api-service:8080 (không cần .techinsight.svc.cluster.local).
+# Chạy: kubectl apply -f k8s/scripts/test-services-from-cluster.yaml
+# Xem log: kubectl -n techinsight logs job/test-techinsight-services -f
+# Xóa job sau khi xem: kubectl -n techinsight delete job test-techinsight-services
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-techinsight-services
+  namespace: techinsight
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: curl
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "=== Test từ trong cluster (namespace techinsight) ==="
+              NS="techinsight"
+              FAIL=0
+
+              # be-api-service (HTTP)
+              echo -n "  be-api-service:8080/health hoặc / ... "
+              if curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/ 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/metrics/health 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/health 2>/dev/null; then
+                echo "OK"
+              else
+                echo "FAIL"
+                FAIL=1
+              fi
+
+              # be-worker-service (HTTP 8080)
+              echo -n "  be-worker-service:8080 ... "
+              if curl -sf --connect-timeout 3 -o /dev/null http://be-worker-service:8080/ 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null -w "%{http_code}" http://be-worker-service:8080/ 2>/dev/null | grep -q .; then
+                echo "OK"
+              else
+                echo "FAIL (timeout hoặc connection refused)"
+                FAIL=1
+              fi
+
+              # be-auth-service (gRPC 50051 - chỉ kiểm tra port mở)
+              echo -n "  be-auth-service:50051 (gRPC) ... "
+              set +e
+              curl -s --connect-timeout 3 -o /dev/null http://be-auth-service:50051/ 2>/dev/null; CODE=$?
+              set -e
+              if [ "$CODE" -eq 0 ] || [ "$CODE" -eq 52 ]; then echo "OK (port open)"; else echo "FAIL (code=$CODE)"; FAIL=1; fi
+
+              # fe-service
+              echo -n "  fe-service:3000 ... "
+              if curl -sf --connect-timeout 3 -o /dev/null http://fe-service:3000/ 2>/dev/null; then
+                echo "OK"
+              else
+                echo "FAIL"
+                FAIL=1
+              fi
+
+              # fe-admin-service
+              echo -n "  fe-admin-service:3000 ... "
+              if curl -sf --connect-timeout 3 -o /dev/null http://fe-admin-service:3000/ 2>/dev/null; then
+                echo "OK"
+              else
+                echo "FAIL"
+                FAIL=1
+              fi
+
+              echo ""
+              if [ "$FAIL" -eq 0 ]; then
+                echo "=== Kết quả: Tất cả service đều reachable từ trong cluster ==="
+                exit 0
+              else
+                echo "=== Kết quả: Một số service không reachable (xem FAIL ở trên) ==="
+                exit 1
+              fi

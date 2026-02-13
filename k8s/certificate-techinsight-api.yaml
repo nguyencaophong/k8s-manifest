@@ -1,0 +1,15 @@
+# Certificate cho api.techinsightsworld.com và admin.techinsightsworld.com
+# Apply: kubectl apply -f k8s/certificate-techinsight-api.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: techinsight-api-tls
+  namespace: techinsight
+spec:
+  secretName: techinsight-api-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - api.techinsightsworld.com
+    - admin.techinsightsworld.com

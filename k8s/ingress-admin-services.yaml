@@ -1,0 +1,105 @@
+# Ingress cho Vault, Consul, Argo CD (dùng khi đã có DNS trỏ về IP).
+# Trước khi apply: cấu hình Argo CD insecure (xem EXPOSE-ADMIN-SERVICES.md Cách 2).
+# Áp dụng: kubectl apply -f ingress-admin-services.yaml
+# Tạo sẵn namespace vault, consul để Ingress apply được; cài Vault/Consul (Helm) sau nếu cần.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vault
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: consul
+---
+# KongPlugin: gửi X-Forwarded-Proto=https để Argo CD tạo đúng URL (tránh ERR_TOO_MANY_REDIRECTS)
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: argocd-forwarded-proto
+  namespace: argocd
+plugin: request-transformer
+config:
+  add:
+    headers:
+      - "X-Forwarded-Proto:https"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-ingress
+  namespace: argocd
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/preserve-host: "true"
+    # Plugin gửi X-Forwarded-Proto để Argo CD không redirect loop
+    konghq.com/plugins: argocd-forwarded-proto
+spec:
+  ingressClassName: kong
+  rules:
+    - host: argocd.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
+  # Bỏ comment nếu dùng cert-manager (sửa secretName / issuer nếu cần)
+  # tls:
+  #   - hosts:
+  #       - argocd.techinsightsworld.com
+  #     secretName: argocd-techinsight-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault-ingress
+  namespace: vault
+  annotations:
+    konghq.com/strip-path: "false"
+spec:
+  ingressClassName: kong
+  rules:
+    - host: vault.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vault
+                port:
+                  number: 8200
+  # tls:
+  #   - hosts:
+  #       - vault.techinsightsworld.com
+  #     secretName: vault-techinsight-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: consul-ingress
+  namespace: consul
+  annotations:
+    konghq.com/strip-path: "false"
+spec:
+  ingressClassName: kong
+  rules:
+    - host: consul.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: consul-server
+                port:
+                  number: 8500
+  # tls:
+  #   - hosts:
+  #       - consul.techinsightsworld.com
+  #     secretName: consul-techinsight-tls

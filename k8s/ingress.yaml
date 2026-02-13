@@ -1,0 +1,64 @@
+# Requires Kong Ingress Controller installed (e.g. helm install kong kong/kong -n kong).
+# Apply after Kong is running; set ingressClassName to the one provided by your Kong install.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: techinsight-ingress
+  namespace: techinsight
+  annotations:
+    konghq.com/strip-path: "false"
+    # Lower priority so cert-manager HTTP-01 solver (/.well-known/acme-challenge/) is matched first
+    konghq.com/regex-priority: "-1"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - api.techinsightsworld.com
+        - admin.techinsightsworld.com
+      secretName: techinsight-api-tls
+    - hosts:
+        - techinsightsworld.com
+        - www.techinsightsworld.com
+      secretName: techinsight-web-tls
+  rules:
+    - host: api.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: be-api-service
+                port:
+                  number: 8080
+    - host: techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-service
+                port:
+                  number: 3000
+    - host: www.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-service
+                port:
+                  number: 3000
+    - host: admin.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fe-admin-service
+                port:
+                  number: 3000

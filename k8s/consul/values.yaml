@@ -1,0 +1,25 @@
+# Example values for: helm install consul hashicorp/consul -n consul -f values.yaml
+# connectInject.apiGateway.manageExternalCRDs: false tránh conflict CRD với Gateway API có sẵn trên cluster (gatewayclasses.gateway.networking.k8s.io).
+global:
+  name: consul
+server:
+  replicas: 1
+  storage: 10Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+ui:
+  enabled: true
+  service:
+    type: ClusterIP
+connect:
+  enabled: false
+# Không quản lý Gateway API CRDs (đã có sẵn trên cluster)
+connectInject:
+  enabled: false
+  apiGateway:
+    manageExternalCRDs: false

@@ -1,0 +1,14 @@
+# Consul Template files: fetch config from Consul KV and write to file.
+# Used by init container in be-api-service, be-worker-service, be-auth-service.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consul-templates
+  namespace: techinsight
+data:
+  be-api-service.tpl: |
+    {{ key "techinsight/config/be-api-service" }}
+  be-worker-service.tpl: |
+    {{ key "techinsight/config/be-worker-service" }}
+  be-auth-service.tpl: |
+    {{ key "techinsight/config/be-auth-service" }}

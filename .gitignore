@@ -1,0 +1,20 @@
+# Secrets and credentials
+.env
+vault-init.json
+letsencrypt/
+
+# Docker volumes and data
+bic-*
+minio-data/
+prometheus_data/
+grafana_data/
+elasticsearch_data/
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db

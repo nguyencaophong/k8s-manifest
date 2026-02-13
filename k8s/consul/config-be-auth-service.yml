@@ -1,0 +1,33 @@
+# Config for be-auth-service. Secrets from Vault.
+app:
+  name: "TechInsight Auth"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+  port: 50051
+auth:
+  grpc:
+    addr: "0.0.0.0:50051"
+security:
+  jwt:
+    secret: "techinsight-prod-jwt-secret-2026-change-me"
+    expiration: "24h"
+  bcrypt:
+    cost: 12
+database:
+  mongodb:
+    uri: "mongodb://mongo1:27017/techinsight?replicaSet=rs0"
+    database: "techinsight"
+    timeout: 10s
+    max_pool_size: 50
+    min_pool_size: 0
+cache:
+  redis:
+    addr: "redis:6379"
+    password: ""
+    db: 0
+    pool_size: 10
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"

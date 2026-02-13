@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: be-api-service
+  namespace: techinsight
+  labels:
+    app: be-api-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: be-api-service
+  template:
+    metadata:
+      labels:
+        app: be-api-service
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-requests-cpu: "50m"
+        vault.hashicorp.com/agent-limits-cpu: "100m"
+        vault.hashicorp.com/agent-requests-mem: "32Mi"
+        vault.hashicorp.com/agent-limits-mem: "64Mi"
+        vault.hashicorp.com/role: "be-api-service"
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/techinsight/be-api-service"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret/data/techinsight/be-api-service" -}}
+          {{ range $k, $v := .Data.data }}
+          export {{ $k }}="{{ $v }}"
+          {{ end }}
+          {{- end -}}
+    spec:
+      serviceAccountName: be-api-service
+      initContainers:
+        - name: consul-template
+          image: hashicorp/consul-template:0.37.6
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+          env:
+            - name: CONSUL_HTTP_ADDR
+              value: "http://consul-server.consul.svc.cluster.local:8500"
+          volumeMounts:
+            - name: config-output
+              mountPath: /app/configs
+            - name: consul-tpl
+              mountPath: /tpl
+              readOnly: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -a
+              . /vault/secrets/config 2>/dev/null || true
+              set +a
+              consul-template -template "/tpl/be-api-service.tpl:/app/configs/config.yml" -once
+      containers:
+        - name: api
+          image: lifegoeson34/techinsight-api:latest
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AUTH_GRPC_ADDR
+              value: "be-auth-service:50051"
+          volumeMounts:
+            - name: config-output
+              mountPath: /app/configs
+              readOnly: true
+          command: ["/bin/sh", "-c", "set -a; . /vault/secrets/config 2>/dev/null || true; set +a; exec ./main"]
+          livenessProbe:
+            httpGet:
+              path: /metrics/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /metrics/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: config-output
+          emptyDir: {}
+        - name: consul-tpl
+          configMap:
+            name: consul-templates
+            items:
+              - key: be-api-service.tpl
+                path: be-api-service.tpl
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: be-api-service
+  namespace: techinsight
+spec:
+  selector:
+    app: be-api-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: ClusterIP

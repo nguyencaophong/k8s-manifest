@@ -1,0 +1,58 @@
+# PodDisruptionBudget - avoid evicting all replicas at once during node drain / upgrade
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-api-service-pdb
+  namespace: techinsight
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-api-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fe-service-pdb
+  namespace: techinsight
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: fe-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fe-admin-service-pdb
+  namespace: techinsight
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: fe-admin-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-auth-service-pdb
+  namespace: techinsight
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-auth-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-worker-service-pdb
+  namespace: techinsight
+spec:
+  minAvailable: 0
+  selector:
+    matchLabels:
+      app: be-worker-service
+---
+# Note: With replicas=1, minAvailable: 1 means no voluntary eviction until another replica is ready.
+# Increase replicas (e.g. to 2) for API/FE to get real HA.

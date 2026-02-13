@@ -1,0 +1,17 @@
+# Certificate cho techinsightsworld.com và www.techinsightsworld.com
+# cert-manager sẽ tự động tạo certificate từ ClusterIssuer khi có Ingress với annotation.
+# File này để đảm bảo Certificate resource tồn tại và có thể kiểm tra status.
+# Apply: kubectl apply -f k8s/certificate-techinsight-web.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: techinsight-web-tls
+  namespace: techinsight
+spec:
+  secretName: techinsight-web-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - techinsightsworld.com
+    - www.techinsightsworld.com
