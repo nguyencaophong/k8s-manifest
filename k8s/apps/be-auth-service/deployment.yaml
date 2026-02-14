@@ -17,8 +17,8 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
-        vault.hashicorp.com/agent-requests-cpu: "50m"
-        vault.hashicorp.com/agent-limits-cpu: "100m"
+        vault.hashicorp.com/agent-requests-cpu: "10m"
+        vault.hashicorp.com/agent-limits-cpu: "50m"
         vault.hashicorp.com/agent-requests-mem: "32Mi"
         vault.hashicorp.com/agent-limits-mem: "64Mi"
         vault.hashicorp.com/role: "be-auth-service"
@@ -31,10 +31,10 @@ spec:
           resources:
             requests:
               memory: "32Mi"
-              cpu: "50m"
+              cpu: "10m"
             limits:
               memory: "64Mi"
-              cpu: "100m"
+              cpu: "50m"
           env:
             - name: CONSUL_HTTP_ADDR
               value: "http://consul-server.consul.svc.cluster.local:8500"
@@ -59,7 +59,7 @@ spec:
           resources:
             requests:
               memory: "64Mi"
-              cpu: "50m"
+              cpu: "25m"
             limits:
               memory: "256Mi"
               cpu: "300m"
