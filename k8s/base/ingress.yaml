@@ -15,6 +15,8 @@ spec:
         - api.techinsightsworld.com
         - admin.techinsightsworld.com
         - minio.techinsightsworld.com
+        - kibana.techinsightsworld.com
+        - redpanda.techinsightsworld.com
       secretName: techinsight-api-tls
     - hosts:
         - techinsightsworld.com
@@ -71,3 +73,23 @@ spec:
                 name: minio
                 port:
                   number: 9000
+    - host: kibana.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kibana
+                port:
+                  number: 5601
+    - host: redpanda.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: redpanda-console
+                port:
+                  number: 8080

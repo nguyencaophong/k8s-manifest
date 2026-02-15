@@ -6,7 +6,7 @@ metadata:
   name: consul-templates
   namespace: techinsight
 data:
-  # Static config only (no secrets)
+  # Static config only (no secrets) — secrets injected via merged.env
   be-api-service.tpl: |
     {{ key "techinsight/config/be-api-service" }}
   be-worker-service.tpl: |
