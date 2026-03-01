@@ -1,0 +1,21 @@
+# Kong plugins for path rewriting
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: strip-api-prefix
+  namespace: techinsight
+config:
+  replace_path: /v1
+  regex_priority: 1
+plugin: request-transformer
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: rewrite-api-path
+  namespace: techinsight
+config:
+  uri_captures:
+    - /api/(.*)
+  replacement: /$1
+plugin: request-transformer-advanced
