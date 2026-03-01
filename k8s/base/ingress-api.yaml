@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: techinsight-api-ingress
+  namespace: techinsight
+  annotations:
+    konghq.com/strip-path: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - api.techinsightsworld.com
+      secretName: techinsight-api-tls
+  rules:
+    - host: api.techinsightsworld.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: be-api-service
+                port:
+                  number: 8080

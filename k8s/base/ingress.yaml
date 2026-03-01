@@ -12,6 +12,7 @@ spec:
   ingressClassName: kong
   tls:
     - hosts:
+        - api.techinsightsworld.com
         - auth.techinsightsworld.com
         - admin.techinsightsworld.com
         - minio.techinsightsworld.com
