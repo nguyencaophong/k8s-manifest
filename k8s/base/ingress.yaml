@@ -12,7 +12,7 @@ spec:
   ingressClassName: kong
   tls:
     - hosts:
-        - api.techinsightsworld.com
+        - auth.techinsightsworld.com
         - admin.techinsightsworld.com
         - minio.techinsightsworld.com
         - kibana.techinsightsworld.com
@@ -23,14 +23,14 @@ spec:
         - www.techinsightsworld.com
       secretName: techinsight-web-tls
   rules:
-    - host: api.techinsightsworld.com
+    - host: auth.techinsightsworld.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: be-api-service
+                name: auth-service
                 port:
                   number: 8080
     - host: techinsightsworld.com

@@ -43,12 +43,9 @@ put_value() {
   echo "Loaded $key"
 }
 
-put_file "techinsight/config/be-api-service" "config-be-api-service.yml"
-put_file "techinsight/config/be-worker-service" "config-be-worker-service.yml"
-put_file "techinsight/config/be-auth-service" "config-be-auth-service.yml"
+put_file "techinsight/templates/core-service" "tpl-core-service.yml"
+put_file "techinsight/templates/auth-service" "tpl-auth-service.yml"
+put_file "techinsight/templates/be-worker-service" "tpl-be-worker-service.yml"
 
-# Config tĩnh DB (host, port) — template merge lấy key này + secret từ Vault
-put_value "techinsight/config/db/host" "${DB_HOST:-mongo1}"
-put_value "techinsight/config/db/port" "${DB_PORT:-27017}"
-
-echo "Done. List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -- consul kv get -recurse techinsight/config/"
+echo "Done. Templates loaded into Consul KV (consul-template sẽ merge với Vault secrets)."
+echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse techinsight/"

@@ -2,17 +2,6 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: be-api-service-pdb
-  namespace: techinsight
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: be-api-service
----
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
   name: fe-service-pdb
   namespace: techinsight
 spec:
@@ -35,13 +24,13 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: be-auth-service-pdb
+  name: auth-service-pdb
   namespace: techinsight
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app: be-auth-service
+      app: auth-service
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

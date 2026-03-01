@@ -33,7 +33,6 @@ Hoặc apply từng bước:
 ```bash
 kubectl apply -f namespace.yaml
 kubectl apply -f serviceaccounts.yaml
-kubectl apply -f consul-templates-configmap.yaml
 kubectl apply -f be-auth-service-deployment.yaml
 kubectl apply -f be-api-service-deployment.yaml
 kubectl apply -f be-worker-service-deployment.yaml

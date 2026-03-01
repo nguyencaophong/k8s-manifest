@@ -1,4 +1,4 @@
-# ArgoCD Application: shared resources (namespace, secrets, serviceaccounts, ingress, certs, pdb, consul-templates)
+# ArgoCD Application: shared resources (namespace, secrets, serviceaccounts, ingress, certs, pdb)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

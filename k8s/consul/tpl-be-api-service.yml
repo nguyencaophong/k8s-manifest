@@ -1,0 +1,213 @@
+app:
+  name: "TechInsight API"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+  port: 8080
+  host: "0.0.0.0"
+  shutdown_timeout: 30s
+  read_timeout: 30s
+  write_timeout: 30s
+  idle_timeout: 120s
+server:
+  cors:
+    allowed_origins:
+      - "http://localhost:3000"
+      - "http://localhost:3001"
+      - "http://localhost:5173"
+      - "https://techinsightsworld.com"
+      - "https://api.techinsightsworld.com"
+      - "https://admin.techinsightsworld.com"
+    allowed_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "PATCH"
+      - "DELETE"
+      - "OPTIONS"
+    allowed_headers:
+      - "Content-Type"
+      - "Authorization"
+      - "X-Requested-With"
+      - "X-Trace-Id"
+    expose_headers:
+      - "X-Total-Count"
+    allow_credentials: true
+    max_age: 3600
+  rate_limit:
+    enabled: true
+    requests_per_minute: 100
+    burst: 50
+kafka:
+  brokers:
+    - "broker:9092"
+  client_id: "techinsight-api"
+  consumer_group_id: "techinsight-api-group"
+  consumer:
+    group_id: "techinsight-api"
+    session_timeout: 10s
+    heartbeat_interval: 3s
+    rebalance_timeout: 60s
+    fetch_min: 1
+    fetch_default: 1048576
+    fetch_max: 10485760
+    retry_backoff: 100ms
+  producer:
+    max_message_size: 1000000
+    flush_frequency: 10ms
+    compression: "snappy"
+    retry_max: 3
+    retry_backoff: 100ms
+    required_acks: 1
+logging:
+  level: "info"
+  format: "json"
+  output: "stdout"
+  file_path: "./logs/app.log"
+  max_size: 100
+  max_backups: 7
+  max_age: 30
+  compress: true
+  caller: true
+  stacktrace: false
+tracing:
+  enabled: true
+  service_name: "techinsight-api"
+  service_version: "1.0.0"
+  otel:
+    exporter_otlp_endpoint: "otel-collector:4317"
+    endpoint: "otel-collector:4317"
+    service_name: "techinsight-api"
+  jaeger:
+    endpoint: "http://localhost:14268/api/traces"
+    sampler_type: "const"
+    sampler_param: 1.0
+    agent_host: "localhost"
+    agent_port: 6831
+    buffer_flush_interval: 1s
+websocket:
+  enabled: true
+  path: "/ws"
+  read_buffer_size: 1024
+  write_buffer_size: 1024
+  handshake_timeout: 10s
+  check_origin: true
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:3001"
+    - "https://techinsightsworld.com"
+auth:
+  grpc:
+    addr: "be-auth-service:50051"
+features:
+  user_registration: true
+  email_verification: true
+  password_reset: true
+  social_login: false
+  premium_features: false
+  analytics: true
+{{- with secret "secret/data/techinsight/be-api-service" }}
+database:
+  mongodb:
+    uri: "{{ .Data.data.mongodb_uri }}"
+    database: "techinsight"
+    timeout: 10s
+    max_pool_size: 100
+    min_pool_size: 0
+    max_idle_time: 900s
+    retry_writes: true
+    read_concern: "majority"
+    write_concern: "majority"
+    enable_logging: true
+security:
+  jwt:
+    secret: "{{ .Data.data.jwt_secret }}"
+    expiration: "24h"
+    refresh_expiration: "168h"
+    issuer: "techinsight-api"
+  bcrypt:
+    cost: 12
+  session:
+    cookie_name: "techinsight_session"
+    cookie_secure: false
+    cookie_http_only: true
+    cookie_same_site: "lax"
+    max_age: 86400
+cache:
+  redis:
+    addr: "redis:6379"
+    password: "{{ .Data.data.redis_password }}"
+    db: 0
+    pool_size: 10
+    min_idle_conns: 0
+    dial_timeout: 5s
+    read_timeout: 3s
+    write_timeout: 3s
+    pool_timeout: 4s
+    idle_timeout: 300s
+    max_retries: 3
+    retry_delay: 100ms
+elasticsearch:
+  url: "http://elasticsearch:9200"
+  username: "{{ .Data.data.elasticsearch_user }}"
+  password: "{{ .Data.data.elasticsearch_password }}"
+  index: "techinsight"
+email:
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "{{ .Data.data.email_smtp_username }}"
+    password: "{{ .Data.data.email_smtp_password }}"
+    from_email: "techbross.dev@gmail.com"
+    from_name: "Techinsights"
+  templates:
+    welcome: "./templates/email/welcome.html"
+    password_reset: "./templates/email/password_reset.html"
+    verification: "./templates/email/verification.html"
+storage:
+  provider: "minio"
+  local:
+    path: "./uploads"
+    max_file_size: 10485760
+  s3:
+    bucket: ""
+    region: ""
+    access_key: ""
+    secret_key: ""
+  minio:
+    endpoint: "minio:9000"
+    access_key: "{{ .Data.data.minio_access_key }}"
+    secret_key: "{{ .Data.data.minio_secret_key }}"
+    use_ssl: false
+    bucket_name: "techinsight"
+    public_url: "https://minio.techinsightsworld.com"
+external:
+  storage:
+    provider: "minio"
+    local:
+      path: "./uploads"
+      max_file_size: 10485760
+    s3:
+      bucket: ""
+      region: ""
+      access_key: ""
+      secret_key: ""
+    minio:
+      endpoint: "minio:9000"
+      access_key: "{{ .Data.data.minio_access_key }}"
+      secret_key: "{{ .Data.data.minio_secret_key }}"
+      use_ssl: false
+      bucket_name: "techinsight"
+      public_url: "https://minio.techinsightsworld.com"
+  image:
+    max_width: 2048
+    max_height: 2048
+    quality: 85
+    formats: ["jpg", "jpeg", "png", "webp"]
+google:
+  client_id: "{{ .Data.data.google_client_id }}"
+  client_secret: "{{ .Data.data.google_client_secret }}"
+  project_id: "techinsights-485016"
+  redirect_uris:
+    - "https://techinsightsworld.com/"
+{{- end }}

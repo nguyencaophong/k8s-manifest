@@ -11,24 +11,21 @@ if [ -z "${SKIP_CLUSTER_CHECK:-}" ] && ! kubectl cluster-info &>/dev/null; then
 fi
 
 echo "Creating namespace and service accounts..."
-kubectl apply -f namespace.yaml
-kubectl apply -f serviceaccounts.yaml
-
-echo "Applying Consul templates (config from Vault+Consul)..."
-kubectl apply -f consul-templates-configmap.yaml
+kubectl apply -f ../base/namespace.yaml
+kubectl apply -f ../base/serviceaccounts.yaml
 
 echo "Applying deployments and services..."
-kubectl apply -f be-auth-service-deployment.yaml
-kubectl apply -f be-api-service-deployment.yaml
-kubectl apply -f be-worker-service-deployment.yaml
-kubectl apply -f fe-service-deployment.yaml
-kubectl apply -f fe-admin-service-deployment.yaml
+kubectl apply -f ../apps/core-service/deployment.yaml
+kubectl apply -f ../apps/auth-service/deployment.yaml
+kubectl apply -f ../apps/be-worker-service/deployment.yaml
+kubectl apply -f ../apps/fe-service/deployment.yaml
+kubectl apply -f ../apps/fe-admin-service/deployment.yaml
 
 echo "Applying ingress..."
-kubectl apply -f ingress.yaml
+kubectl apply -f ../base/ingress.yaml
 
 echo "Applying PDB..."
-kubectl apply -f pdb.yaml
+kubectl apply -f ../base/pdb.yaml
 
 echo "Done. Verify: ./verify-connections.sh"
 kubectl -n techinsight get pods -o wide 2>/dev/null || true

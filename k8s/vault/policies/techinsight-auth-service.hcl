@@ -1,4 +1,4 @@
-# Policy for be-auth-service. Read only this service's secret (single path, least privilege).
+# Policy for auth-service. Reads same secret path as legacy be-auth-service (no re-populate needed).
 path "secret/data/techinsight/be-auth-service" {
   capabilities = ["read"]
 }

@@ -43,19 +43,17 @@ spec:
           volumeMounts:
             - name: config-output
               mountPath: /app/configs
-            - name: consul-tpl
-              mountPath: /tpl
-              readOnly: true
           command:
             - /bin/sh
             - -c
             - |
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
-              if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); fi
-              consul-template -template "/tpl/be-api-service.tpl:/app/configs/config.yml" -template "/tpl/be-api-service-env.tpl:/app/configs/merged.env" -once
+              if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
+              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/techinsight/templates/be-api-service?raw"
+              consul-template -template "/tmp/tpl.yml:/app/configs/config.yml" -once
       containers:
         - name: api
-          image: lifegoeson34/techinsight-api:latest
+          image: lifegoeson34/techinsight-core-service:latest
           resources:
             requests:
               memory: "128Mi"
@@ -68,34 +66,33 @@ spec:
           env:
             - name: AUTH_GRPC_ADDR
               value: "be-auth-service:50051"
+            - name: CONFIG_FILEPATH
+              value: "/app/configs/config.yml"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
           volumeMounts:
             - name: config-output
               mountPath: /app/configs
               readOnly: true
-          command: ["/bin/sh", "-c", "set -a; . /app/configs/merged.env 2>/dev/null || true; set +a; exec ./main"]
+          command: ["/bin/sh", "-c", "exec ./main"]
           livenessProbe:
             httpGet:
               path: /metrics/health
               port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /metrics/health
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: 15
+            periodSeconds: 10
       volumes:
         - name: config-output
           emptyDir: {}
-        - name: consul-tpl
-          configMap:
-            name: consul-templates
-            items:
-              - key: be-api-service.tpl
-                path: be-api-service.tpl
-              - key: be-api-service-env.tpl
-                path: be-api-service-env.tpl
 ---
 apiVersion: v1
 kind: Service

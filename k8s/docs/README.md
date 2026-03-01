@@ -37,7 +37,6 @@ Apply **serviceaccounts.yaml** before or with the rest so Vault roles can bind t
 ```bash
 kubectl apply -f namespace.yaml
 kubectl apply -f serviceaccounts.yaml
-kubectl apply -f consul-templates-configmap.yaml
 kubectl apply -f be-auth-service-deployment.yaml
 kubectl apply -f be-api-service-deployment.yaml
 kubectl apply -f be-worker-service-deployment.yaml
@@ -75,4 +74,4 @@ Or run:
 
 ## External infra
 
-If MongoDB, Redis, Kafka, MinIO, or Elasticsearch run outside the cluster, update Consul KV (e.g. `techinsight/config/be-api-service`) or Vault secrets with the external hostnames, then restart the deployments.
+If MongoDB, Redis, Kafka, MinIO, or Elasticsearch run outside the cluster, update Consul KV templates (e.g. `techinsight/templates/be-api-service`) or Vault secrets with the external hostnames, then restart the deployments.

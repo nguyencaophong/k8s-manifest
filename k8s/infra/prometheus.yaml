@@ -27,9 +27,9 @@ data:
         metrics_path: /_prometheus/metrics
         scrape_interval: 30s
 
-      - job_name: 'techinsight-api'
+      - job_name: 'techinsight-core-api'
         static_configs:
-          - targets: ['be-api-service:8080']
+          - targets: ['core-service:8080']
         metrics_path: /metrics
         scrape_interval: 15s
 

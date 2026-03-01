@@ -1,8 +1,8 @@
-# ArgoCD Application: Backend API Service
+# ArgoCD Application: Auth Service (gRPC)
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: techinsight-be-api-service
+  name: techinsight-auth-service
   namespace: argocd
   labels:
     app.kubernetes.io/part-of: techinsight
@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s/apps/be-api-service
+    path: k8s/apps/auth-service
   destination:
     server: https://kubernetes.default.svc
     namespace: techinsight

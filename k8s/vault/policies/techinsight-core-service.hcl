@@ -1,4 +1,4 @@
-# Policy for be-api-service. Read only this service's secret (single path, least privilege).
+# Policy for core-service. Reads same secret path as legacy be-api-service (no re-populate needed).
 path "secret/data/techinsight/be-api-service" {
   capabilities = ["read"]
 }

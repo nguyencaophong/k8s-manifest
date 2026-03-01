@@ -10,7 +10,7 @@ kubectl -n "$NS" get pods -o wide
 echo ""
 
 echo "=== 2. Status theo từng service (Ready/Desired) ==="
-for app in be-api-service be-auth-service be-worker-service fe-service fe-admin-service; do
+for app in core-service auth-service be-worker-service fe-service fe-admin-service; do
   DESIRED=$(kubectl -n "$NS" get deployment "$app" -o jsonpath='{.spec.replicas}' 2>/dev/null || echo "0")
   READY=$(kubectl -n "$NS" get deployment "$app" -o jsonpath='{.status.readyReplicas}' 2>/dev/null || echo "0")
   if [ -z "$DESIRED" ] || [ "$DESIRED" = "0" ]; then
@@ -34,16 +34,16 @@ kubectl -n "$NS" get ingress 2>/dev/null || true
 echo ""
 
 echo "=== 5. Kiểm tra kết nối trong cluster ==="
-API_POD=$(kubectl -n "$NS" get pods -l app=be-api-service -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+API_POD=$(kubectl -n "$NS" get pods -l app=core-service -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
 if [ -n "$API_POD" ]; then
-  if kubectl -n "$NS" exec "$API_POD" -c api -- wget -qO- --timeout=3 http://be-api-service:8080/metrics/health 2>/dev/null | grep -q .; then
-    echo "  be-api-service (health): OK"
+  if kubectl -n "$NS" exec "$API_POD" -c api -- wget -qO- --timeout=3 http://core-service:8080/metrics/health 2>/dev/null | grep -q .; then
+    echo "  core-service (health): OK"
   else
-    echo "  be-api-service (health): FAIL (pod có thể đang start hoặc lỗi)"
+    echo "  core-service (health): FAIL (pod có thể đang start hoặc lỗi)"
     FAIL=1
   fi
 else
-  echo "  be-api-service: không có pod để kiểm tra"
+  echo "  core-service: không có pod để kiểm tra"
   FAIL=1
 fi
 

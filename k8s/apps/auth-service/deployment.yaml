@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: be-worker-service
+  name: auth-service
   namespace: techinsight
   labels:
-    app: be-worker-service
+    app: auth-service
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: be-worker-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: be-worker-service
+        app: auth-service
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
@@ -21,10 +21,10 @@ spec:
         vault.hashicorp.com/agent-limits-cpu: "50m"
         vault.hashicorp.com/agent-requests-mem: "32Mi"
         vault.hashicorp.com/agent-limits-mem: "64Mi"
-        vault.hashicorp.com/role: "be-worker-service"
+        vault.hashicorp.com/role: "be-auth-service"
         vault.hashicorp.com/agent-inject-token: "true"
     spec:
-      serviceAccountName: be-worker-service
+      serviceAccountName: be-auth-service
       initContainers:
         - name: consul-template
           image: hashicorp/consul-template:0.37.6
@@ -49,18 +49,21 @@ spec:
             - |
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
-              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/techinsight/templates/be-worker-service?raw"
+              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/techinsight/templates/auth-service?raw"
               consul-template -template "/tmp/tpl.yml:/app/configs/config.yml" -once
       containers:
-        - name: worker
-          image: lifegoeson34/techinsight-core-service:latest
+        - name: auth
+          image: lifegoeson34/techinsight-auth-service:latest
           resources:
             requests:
-              memory: "128Mi"
+              memory: "64Mi"
               cpu: "25m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "256Mi"
+              cpu: "300m"
+          ports:
+            - containerPort: 50051
+              name: grpc
           env:
             - name: CONFIG_FILEPATH
               value: "/app/configs/config.yml"
@@ -72,17 +75,17 @@ spec:
             - name: config-output
               mountPath: /app/configs
               readOnly: true
-          command: ["/bin/sh", "-c", "exec ./worker"]
+          command: ["/bin/sh", "-c", "exec ./main"]
           livenessProbe:
-            exec:
-              command: ["sh", "-c", "test -f /app/configs/config.yml"]
-            initialDelaySeconds: 15
-            periodSeconds: 20
-          readinessProbe:
-            exec:
-              command: ["sh", "-c", "test -f /app/configs/config.yml"]
-            initialDelaySeconds: 5
+            tcpSocket:
+              port: 50051
+            initialDelaySeconds: 10
             periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: config-output
           emptyDir: {}
@@ -90,13 +93,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: be-worker-service
+  name: auth-service
   namespace: techinsight
 spec:
   selector:
-    app: be-worker-service
+    app: auth-service
   ports:
-    - port: 8080
-      targetPort: 8080
-      name: http
+    - port: 50051
+      targetPort: 50051
+      name: grpc
   type: ClusterIP

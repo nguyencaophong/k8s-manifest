@@ -1,5 +1,5 @@
 # Job: chạy trong cluster để test kết nối từ "trong cluster" tới các service TechInsight.
-# Dùng namespace techinsight để DNS ngắn: be-api-service:8080 (không cần .techinsight.svc.cluster.local).
+# Dùng namespace techinsight để DNS ngắn: core-service:8080 (không cần .techinsight.svc.cluster.local).
 # Chạy: kubectl apply -f k8s/scripts/test-services-from-cluster.yaml
 # Xem log: kubectl -n techinsight logs job/test-techinsight-services -f
 # Xóa job sau khi xem: kubectl -n techinsight delete job test-techinsight-services
@@ -26,9 +26,9 @@ spec:
               NS="techinsight"
               FAIL=0
 
-              # be-api-service (HTTP)
-              echo -n "  be-api-service:8080/health hoặc / ... "
-              if curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/ 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/metrics/health 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://be-api-service:8080/health 2>/dev/null; then
+              # core-service (HTTP)
+              echo -n "  core-service:8080/health hoặc / ... "
+              if curl -sf --connect-timeout 3 -o /dev/null http://core-service:8080/ 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://core-service:8080/metrics/health 2>/dev/null || curl -sf --connect-timeout 3 -o /dev/null http://core-service:8080/health 2>/dev/null; then
                 echo "OK"
               else
                 echo "FAIL"
@@ -44,10 +44,10 @@ spec:
                 FAIL=1
               fi
 
-              # be-auth-service (gRPC 50051 - chỉ kiểm tra port mở)
-              echo -n "  be-auth-service:50051 (gRPC) ... "
+              # auth-service (gRPC 50051 - chỉ kiểm tra port mở)
+              echo -n "  auth-service:50051 (gRPC) ... "
               set +e
-              curl -s --connect-timeout 3 -o /dev/null http://be-auth-service:50051/ 2>/dev/null; CODE=$?
+              curl -s --connect-timeout 3 -o /dev/null http://auth-service:50051/ 2>/dev/null; CODE=$?
               set -e
               if [ "$CODE" -eq 0 ] || [ "$CODE" -eq 52 ]; then echo "OK (port open)"; else echo "FAIL (code=$CODE)"; FAIL=1; fi
 

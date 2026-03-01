@@ -1,71 +1,56 @@
-# Consul for TechInsight (variables / config)
+# Consul for TechInsight (templates + config)
 
-Use Consul KV for non-secret configuration (variables). Secrets stay in Vault; Consul holds app config (URIs, feature flags, etc.) that can change without redeploy.
+Consul KV lưu **consul-template** cho mỗi service. Mỗi template chứa:
+- Non-secret config (app, server, kafka, logging, tracing...)
+- Vault secret references (`{{ .Data.data.xxx }}`) cho database, security, cache, storage...
 
-## 1. Install Consul (Helm example)
+Khi pod khởi động, init container `consul-template`:
+1. Lấy template từ Consul KV HTTP API (`wget`)
+2. Render template (thay `{{ .Data.data.xxx }}` bằng giá trị thực từ Vault)
+3. Ghi ra `/app/configs/config.yml` → app đọc file này
+
+## 1. Install Consul (Helm)
 
 ```bash
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
-helm install consul hashicorp/consul -n consul --create-namespace \
-  -f values.yaml
+helm install consul hashicorp/consul -n consul --create-namespace -f values.yaml
 ```
 
-Example `values.yaml` (minimal for KV only):
+## 2. Consul KV layout
 
-```yaml
-global:
-  name: consul
-server:
-  replicas: 1
-  storage: 10Gi
-ui:
-  enabled: true
-connect:
-  enabled: false   # set true if you use service mesh later
-```
+| Key | Mô tả |
+|-----|-------|
+| `techinsight/templates/core-service` | Template cho core-service (API chính) |
+| `techinsight/templates/auth-service` | Template cho auth-service |
+| `techinsight/templates/be-worker-service` | Template cho be-worker-service |
 
-## 2. Consul KV keys (variables)
-
-Suggested key layout. Values are plain text or JSON.
-
-| Key | Description |
-|-----|-------------|
-| `techinsight/config/app/environment` | production / staging |
-| `techinsight/config/app/port` | 8080 |
-| `techinsight/config/database/mongodb_uri` | mongodb://mongo1:27017/techinsight?replicaSet=rs0 |
-| `techinsight/config/cache/redis_addr` | redis:6379 |
-| `techinsight/config/kafka/brokers` | ["broker:29092"] |
-| `techinsight/config/auth/grpc_addr` | be-auth-service:50051 |
-| `techinsight/config/elasticsearch/url` | http://elasticsearch:9200 |
-| `techinsight/config/features/analytics` | true |
-
-Example:
+## 3. Load templates vào Consul KV
 
 ```bash
-consul kv put techinsight/config/app/environment production
-consul kv put techinsight/config/database/mongodb_uri "mongodb://mongo1:27017/techinsight?replicaSet=rs0"
-consul kv put techinsight/config/auth/grpc_addr be-auth-service:50051
+cd k8s/consul
+./load-config-into-consul.sh
 ```
 
-## 3. Service account / ACL (optional)
-
-To restrict read access with Consul ACLs:
-
-- Create a policy that allows read on `techinsight/` prefix.
-- Use Consul Kubernetes auth (Consul 1.9+) or store a Consul token in Vault and inject it via Vault Agent (same SA auth flow). Apps then use `CONSUL_HTTP_TOKEN` to read KV.
-
-Storing Consul token in Vault:
+Hoặc thủ công:
 
 ```bash
-vault kv patch secret/techinsight/be-api-service CONSUL_HTTP_TOKEN="<consul-acl-token>"
+kubectl cp tpl-core-service.yml consul/consul-server-0:/tmp/tpl.yml -c consul
+kubectl exec -n consul consul-server-0 -c consul -- consul kv put techinsight/templates/core-service @/tmp/tpl.yml
 ```
 
-The existing Vault Agent inject will expose it as env; app or Consul Template can use it to read KV.
+## 4. Cập nhật config
 
-## 4. Reading config in the app
+1. Sửa file `tpl-core-service.yml`, `tpl-auth-service.yml` hoặc `tpl-be-worker-service.yml`
+2. Load lại vào Consul KV (bước 3)
+3. Rollout restart deployment: `kubectl rollout restart deployment core-service auth-service be-worker-service -n techinsight`
 
-- **Option A**: App uses Consul client at startup (e.g. `consul/api` in Go), reads KV, builds config. Needs `CONSUL_HTTP_ADDR` and `CONSUL_HTTP_TOKEN` (from Vault).
-- **Option B**: Consul Template sidecar or init container: template reads KV and writes `config.yml` to shared volume; app keeps reading from file. Consul token can be injected from Vault into the template container.
+## 5. Verify
 
-If you use Option B, add a Consul Template deployment or init container that renders `config.yml` from KV keys; point the app’s config path at the rendered file.
+```bash
+# Xem template trong Consul KV
+kubectl exec -n consul consul-server-0 -c consul -- consul kv get techinsight/templates/core-service
+
+# Xem config đã render trong pod
+kubectl exec -n techinsight <pod-name> -c api -- cat /app/configs/config.yml
+```
