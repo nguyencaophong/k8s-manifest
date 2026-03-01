@@ -13,7 +13,6 @@ spec:
   tls:
     - hosts:
         - api.techinsightsworld.com
-        - auth.techinsightsworld.com
         - admin.techinsightsworld.com
         - minio.techinsightsworld.com
         - kibana.techinsightsworld.com
@@ -32,16 +31,6 @@ spec:
             backend:
               service:
                 name: be-api-service
-                port:
-                  number: 8080
-    - host: auth.techinsightsworld.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: auth-service
                 port:
                   number: 8080
     - host: techinsightsworld.com
