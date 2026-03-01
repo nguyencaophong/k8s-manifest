@@ -33,8 +33,6 @@ spec:
               value: "http://be-api-service:8080"
             - name: VITE_API_URL
               value: "https://api.techinsightsworld.com"
-            - name: VITE_AUTH_URL
-              value: "https://auth.techinsightsworld.com"
             - name: VITE_MINIO_DOMAIN
               value: "https://minio.techinsightsworld.com"
           livenessProbe:
