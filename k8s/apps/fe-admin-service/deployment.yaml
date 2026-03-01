@@ -30,9 +30,9 @@ spec:
             - containerPort: 3000
           env:
             - name: API_URL
-              value: "http://core-service:8080/v1"
+              value: "http://auth-service:8080"
             - name: VITE_API_URL
-              value: "https://core.techinsightsworld.com/v1"
+              value: "https://auth.techinsightsworld.com"
             - name: VITE_MINIO_DOMAIN
               value: "https://minio.techinsightsworld.com"
           livenessProbe:

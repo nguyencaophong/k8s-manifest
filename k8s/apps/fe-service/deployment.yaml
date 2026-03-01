@@ -30,7 +30,7 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_CORE_URL
-              value: "https://core.techinsightsworld.com/v1"
+              value: "https://core.techinsightsworld.com"
             - name: NEXT_PUBLIC_AUTH_URL
               value: "https://auth.techinsightsworld.com"
             - name: NEXT_PUBLIC_MINIO_ENDPOINT
@@ -56,7 +56,7 @@ metadata:
   name: fe-service
   namespace: techinsight
 spec:
-  selector:
+  selector: 
     app: fe-service
   ports:
     - port: 3000
