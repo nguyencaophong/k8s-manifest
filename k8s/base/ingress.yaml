@@ -27,6 +27,13 @@ spec:
     - host: api.techinsightsworld.com
       http:
         paths:
+          - path: /v1/auth-services
+            pathType: Prefix
+            backend:
+              service:
+                name: be-auth-service
+                port:
+                  number: 50051
           - path: /
             pathType: Prefix
             backend:
