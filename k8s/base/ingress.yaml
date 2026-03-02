@@ -43,7 +43,7 @@ spec:
               service:
                 name: be-auth-service
                 port:
-                  number: 43501
+                  number: 8081
     - host: techinsightsworld.com
       http:
         paths:
