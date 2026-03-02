@@ -64,6 +64,8 @@ spec:
           ports:
             - containerPort: 50051
               name: grpc
+            - containerPort: 43501
+              name: http
           env:
             - name: CONFIG_FILEPATH
               value: "/app/configs/config.yml"
@@ -102,4 +104,7 @@ spec:
     - port: 50051
       targetPort: 50051
       name: grpc
+    - port: 43501
+      targetPort: 43501
+      name: http
   type: ClusterIP

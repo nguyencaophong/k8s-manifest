@@ -41,9 +41,9 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: be-api-service
+                name: be-auth-service
                 port:
-                  number: 8080
+                  number: 43501
     - host: techinsightsworld.com
       http:
         paths:
