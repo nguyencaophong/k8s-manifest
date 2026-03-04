@@ -3,7 +3,7 @@
 # Strategy: latest - re-syncs whenever the :latest tag points to a new image.
 # Write-back: argocd - patches the live ArgoCD Application parameter directly.
 #
-# allowTags regex "^latest$" pins tracking to the :latest tag only.
+
 ---
 # Backend API Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
@@ -16,7 +16,6 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-api-service
       images:
@@ -37,7 +36,6 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-auth-service
       images:
@@ -58,7 +56,6 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-worker-service
       images:
@@ -79,7 +76,6 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-fe-service
       images:
@@ -100,7 +96,6 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-fe-admin-service
       images:
