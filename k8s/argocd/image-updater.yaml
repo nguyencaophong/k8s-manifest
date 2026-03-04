@@ -15,8 +15,8 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: latest
-    allowTags: "^latest$"
+    updateStrategy: newest-build
+    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-api-service
       images:
@@ -36,8 +36,8 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: latest
-    allowTags: "^latest$"
+    updateStrategy: newest-build
+    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-auth-service
       images:
@@ -57,8 +57,8 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: latest
-    allowTags: "^latest$"
+    updateStrategy: newest-build
+    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-be-worker-service
       images:
@@ -78,8 +78,8 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: latest
-    allowTags: "^latest$"
+    updateStrategy: newest-build
+    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-fe-service
       images:
@@ -99,8 +99,8 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: latest
-    allowTags: "^latest$"
+    updateStrategy: newest-build
+    allowTags: "latest"
   applicationRefs:
     - namePattern: techinsight-fe-admin-service
       images:
