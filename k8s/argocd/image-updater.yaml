@@ -1,0 +1,114 @@
+# ArgoCD Image Updater v1.1.1 - CRD-based configuration
+# Watches DockerHub for new image digests on :latest tag.
+# Strategy: digest - triggers on every new push to :latest even without new tag.
+# Write-back: argocd - patches the live ArgoCD Application parameter directly
+#   (no git commit needed; ArgoCD then syncs the new digest into the cluster).
+#
+# For git write-back (alternative): set method: git and configure argocd-image-updater-secret
+#   kubectl patch secret argocd-image-updater-secret -n argocd \
+#     --type=merge -p '{"stringData":{"git.user":"<user>","git.password":"<token>"}}'
+---
+# Backend API Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: techinsight-be-api-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "latest"
+  applicationRefs:
+    - namePattern: techinsight-be-api-service
+      images:
+        - alias: api
+          imageName: lifegoeson34/techinsight-core-service
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/techinsight-core-service
+---
+# Backend Auth Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: techinsight-be-auth-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "latest"
+  applicationRefs:
+    - namePattern: techinsight-be-auth-service
+      images:
+        - alias: auth
+          imageName: lifegoeson34/techinsight-auth-service
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/techinsight-auth-service
+---
+# Backend Worker Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: techinsight-be-worker-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "latest"
+  applicationRefs:
+    - namePattern: techinsight-be-worker-service
+      images:
+        - alias: worker
+          imageName: lifegoeson34/techinsight-core-service
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/techinsight-core-service
+---
+# Frontend Web Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: techinsight-fe-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "latest"
+  applicationRefs:
+    - namePattern: techinsight-fe-service
+      images:
+        - alias: web
+          imageName: lifegoeson34/techinsight-web
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/techinsight-web
+---
+# Frontend Admin Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: techinsight-fe-admin-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "latest"
+  applicationRefs:
+    - namePattern: techinsight-fe-admin-service
+      images:
+        - alias: admin
+          imageName: lifegoeson34/techinsight-admin
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/techinsight-admin
