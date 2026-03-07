@@ -1,3 +1,4 @@
+{{- with secret "secret/data/techinsight/be-worker-service" }}
 app:
   name: "TechInsight Worker"
   version: "1.0.0"
@@ -58,7 +59,7 @@ tracing:
     buffer_flush_interval: 1s
 auth:
   grpc:
-    addr: "auth-service:50051"
+    addr: "be-auth-service:50052"
 features:
   user_registration: true
   email_verification: true
@@ -66,11 +67,10 @@ features:
   social_login: false
   premium_features: false
   analytics: true
-{{- with secret "secret/data/techinsight/be-worker-service" }}
 database:
   mongodb:
     uri: "{{ .Data.data.mongodb_uri }}"
-    database: "techinsight"
+    database: "techinsights-core-service"
     timeout: 10s
     max_pool_size: 100
     min_pool_size: 0
@@ -85,14 +85,15 @@ security:
     expiration: "24h"
     refresh_expiration: "168h"
     issuer: "techinsight-api"
-  bcrypt:
-    cost: 12
-  session:
-    cookie_name: "techinsight_session"
-    cookie_secure: false
-    cookie_http_only: true
-    cookie_same_site: "lax"
-    max_age: 86400
+  cookie:
+    access_token_name: "access_token"
+    refresh_token_name: "refresh_token"
+    secure: true                              
+    http_only: true                           
+    same_site: "Lax"                          
+    refresh_token_same_site: "Strict"         
+    domain: ".techinsightsworld.com"          
+    refresh_token_path: "/v1/auth-services/auth/refresh" 
 cache:
   redis:
     addr: "redis:6379"
