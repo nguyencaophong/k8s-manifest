@@ -43,8 +43,8 @@ put_value() {
   echo "Loaded $key"
 }
 
-put_file "techinsight/templates/core-service" "tpl-core-service.yml"
-put_file "techinsight/templates/auth-service" "tpl-auth-service.yml"
+put_file "techinsight/templates/be-api-service" "tpl-be-api-service.yml"
+put_file "techinsight/templates/be-auth-service" "tpl-be-auth-service.yml"
 put_file "techinsight/templates/be-worker-service" "tpl-be-worker-service.yml"
 
 echo "Done. Templates loaded into Consul KV (consul-template sẽ merge với Vault secrets)."

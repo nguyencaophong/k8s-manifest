@@ -30,7 +30,7 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_AUTH_URL
-              value: "https://auth.techinsightsworld.com"
+              value: "https://api.techinsightsworld.com"
             - name: NEXT_PUBLIC_SITE_URL
               value: "https://techinsightsworld.com"
             - name: NEXT_PUBLIC_MINIO_ENDPOINT

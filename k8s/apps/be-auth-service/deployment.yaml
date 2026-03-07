@@ -80,14 +80,16 @@ spec:
           command: ["/bin/sh", "-c", "exec ./main"]
           livenessProbe:
             tcpSocket:
-              port: 50052
-            initialDelaySeconds: 10
-            periodSeconds: 10
+              port: 50051
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 5
           readinessProbe:
             tcpSocket:
-              port: 50052
-            initialDelaySeconds: 5
-            periodSeconds: 5
+              port: 50051
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
       volumes:
         - name: config-output
           emptyDir: {}

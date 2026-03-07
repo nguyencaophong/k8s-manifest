@@ -174,14 +174,14 @@ websocket:
   path: "/ws"
 auth:
   grpc:
-    addr: "be-auth-service:50051"
+    addr: "be-auth-service:50052"
 ```
 
 ### be-auth-service: Identity Over gRPC
 
-The auth service is a dedicated gRPC server on port 50051. It owns user identity: login, token issuance (JWT), token validation, and profile retrieval. By isolating auth into its own service:
+The auth service exposes HTTP on port `50051` (public REST via `/v1/auth-services` path on `api.techinsightsworld.com`) and gRPC on port `50052` (internal service-to-service communication). It owns user identity: login, token issuance (JWT), token validation, and profile retrieval. By isolating auth into its own service:
 
-- Security surface is smaller (only gRPC, no HTTP)
+- Security surface is smaller (gRPC internal, HTTP proxied via Kong)
 - It can be scaled independently during login spikes
 - Token logic changes do not require redeploying the API
 
@@ -500,7 +500,7 @@ spec:
             - name: CONFIG_FILEPATH
               value: "/app/configs/config.yml"
             - name: AUTH_GRPC_ADDR
-              value: "be-auth-service:50051"
+              value: "be-auth-service:50052"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "otel-collector:4317"
 ```
@@ -538,7 +538,7 @@ Each service uses health probes appropriate to its protocol:
 | Service | Liveness | Readiness |
 |---------|----------|-----------|
 | be-api-service | HTTP `GET /metrics/health:8080` (45s initial delay) | HTTP `GET /metrics/health:8080` (15s initial delay) |
-| be-auth-service | TCP socket on 50051 | TCP socket on 50051 |
+| be-auth-service | TCP socket on 50052 | TCP socket on 50052 |
 | be-worker-service | exec `test -f /app/configs/config.yml` | exec `test -f /app/configs/config.yml` |
 | fe-service | HTTP `GET /:3000` | HTTP `GET /:3000` |
 | fe-admin-service | HTTP `GET /:3000` | HTTP `GET /:3000` |

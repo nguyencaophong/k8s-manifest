@@ -70,7 +70,7 @@ Or run:
 
 ## Internal gRPC
 
-`be-api-service` calls `be-auth-service` at `be-auth-service:50051` via ClusterIP. No Ingress is used for gRPC.
+`be-api-service` calls `be-auth-service` at `be-auth-service:50052` (gRPC) via ClusterIP. No Ingress is used for internal gRPC.
 
 ## External infra
 

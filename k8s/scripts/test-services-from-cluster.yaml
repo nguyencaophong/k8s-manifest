@@ -44,10 +44,10 @@ spec:
                 FAIL=1
               fi
 
-              # auth-service (gRPC 50051 - chỉ kiểm tra port mở)
-              echo -n "  auth-service:50051 (gRPC) ... "
+              # auth-service (HTTP 50051 - chỉ kiểm tra port mở)
+              echo -n "  be-auth-service:50051 (HTTP) ... "
               set +e
-              curl -s --connect-timeout 3 -o /dev/null http://auth-service:50051/ 2>/dev/null; CODE=$?
+              curl -s --connect-timeout 3 -o /dev/null http://be-auth-service:50051/ 2>/dev/null; CODE=$?
               set -e
               if [ "$CODE" -eq 0 ] || [ "$CODE" -eq 52 ]; then echo "OK (port open)"; else echo "FAIL (code=$CODE)"; FAIL=1; fi
 

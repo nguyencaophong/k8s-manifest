@@ -16,8 +16,7 @@ server:
       - "http://localhost:3001"
       - "http://localhost:5173"
       - "https://techinsightsworld.com"
-      - "https://core.techinsightsworld.com"
-      - "https://auth.techinsightsworld.com"
+      - "https://api.techinsightsworld.com"
       - "https://admin.techinsightsworld.com"
     allowed_methods:
       - "GET"
@@ -99,7 +98,7 @@ websocket:
     - "https://techinsightsworld.com"
 auth:
   grpc:
-    addr: "auth-service:50051"
+    addr: "be-auth-service:50052"
 features:
   user_registration: true
   email_verification: true
