@@ -32,7 +32,7 @@ spec:
               service:
                 name: be-auth-service
                 port:
-                  number: 50051
+                  number: 8081
           - path: /
             pathType: Prefix
             backend:

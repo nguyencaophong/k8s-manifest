@@ -9,38 +9,84 @@ data:
       otlp:
         protocols:
           grpc:
-            endpoint: "0.0.0.0:4317"
+            endpoint: 0.0.0.0:4317
           http:
-            endpoint: "0.0.0.0:4318"
+            endpoint: 0.0.0.0:4318
+
     processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 512
+        spike_limit_mib: 128
+
       batch:
-        timeout: 10s
+        timeout: 1s
+        send_batch_size: 1024
+
+      resource:
+        attributes:
+          - key: service.name
+            from_attribute: service.name
+            action: upsert
+          - key: environment
+            value: production
+            action: upsert
+
+      transform/logs:
+        log_statements:
+          - context: log
+            statements: []
+
     exporters:
       elasticsearch:
-        endpoints:
-          - "http://elasticsearch:9200"
-        logs_index: "techinsight-logs"
-        traces_index: "techinsight-traces"
+        endpoints: ["http://elasticsearch:9200"]
+        logs_index: techinsight-logs
+        traces_index: techinsight-traces
+        logs_dynamic_index:
+          enabled: true
+        mapping:
+          mode: raw
+        timeout: 30s
+
+      debug:
+        verbosity: detailed
+
       prometheus:
         endpoint: "0.0.0.0:8889"
+
     extensions:
       health_check:
-        endpoint: "0.0.0.0:13133"
+        endpoint: 0.0.0.0:13133
+      pprof:
+        endpoint: 0.0.0.0:1777
+      zpages:
+        endpoint: 0.0.0.0:55679
+
     service:
-      extensions: [health_check]
+      extensions: [health_check, pprof, zpages]
+
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch]
-          exporters: [elasticsearch]
-        metrics:
-          receivers: [otlp]
-          processors: [batch]
-          exporters: [prometheus]
+          processors: [memory_limiter, batch, resource]
+          exporters: [elasticsearch, debug]
+
         logs:
           receivers: [otlp]
-          processors: [batch]
-          exporters: [elasticsearch]
+          processors: [memory_limiter, batch, resource, transform/logs]
+          exporters: [elasticsearch, debug]
+
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [prometheus, debug]
+
+      telemetry:
+        logs:
+          level: info
+        metrics:
+          level: detailed
+          address: 0.0.0.0:8888
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,6 +116,14 @@ spec:
               name: otlp-http
             - containerPort: 13133
               name: health
+            - containerPort: 8888
+              name: telemetry
+            - containerPort: 8889
+              name: prometheus
+            - containerPort: 1777
+              name: pprof
+            - containerPort: 55679
+              name: zpages
           resources:
             requests:
               memory: "128Mi"
@@ -116,4 +170,10 @@ spec:
     - port: 13133
       targetPort: 13133
       name: health
+    - port: 8888
+      targetPort: 8888
+      name: telemetry
+    - port: 8889
+      targetPort: 8889
+      name: prometheus
   type: ClusterIP

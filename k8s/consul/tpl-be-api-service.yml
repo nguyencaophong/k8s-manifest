@@ -97,9 +97,6 @@ websocket:
     - "http://localhost:3000"
     - "http://localhost:3001"
     - "https://techinsightsworld.com"
-auth:
-  grpc:
-    addr: "be-auth-service:50052"
 features:
   user_registration: true
   email_verification: true
@@ -183,6 +180,7 @@ storage:
     bucket_name: "techinsight"
     public_url: "https://minio.techinsightsworld.com"
 external:
+  auth_grpc_endpoint: "be-auth-service:50051"
   storage:
     provider: "minio"
     local:

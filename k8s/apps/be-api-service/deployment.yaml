@@ -65,7 +65,7 @@ spec:
             - containerPort: 8080
           env:
             - name: AUTH_GRPC_ADDR
-              value: "be-auth-service:50052"
+              value: "be-auth-service:50051"
             - name: CONFIG_FILEPATH
               value: "/app/configs/config.yml"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT

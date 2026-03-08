@@ -14,7 +14,7 @@ kafka:
   brokers:
     - "broker:9092"
   client_id: "techinsight-worker"
-  consumer_group_id: "techinsight-api-group"
+  consumer_group_id: "techinsight-worker-group"
   consumer:
     group_id: "techinsight-worker"
     session_timeout: 10s
@@ -57,9 +57,17 @@ tracing:
     agent_host: "localhost"
     agent_port: 6831
     buffer_flush_interval: 1s
-auth:
-  grpc:
-    addr: "be-auth-service:50052"
+websocket:
+  enabled: true
+  path: "/ws"
+  read_buffer_size: 1024
+  write_buffer_size: 1024
+  handshake_timeout: 10s
+  check_origin: true
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:3001"
+    - "https://techinsightsworld.com"
 features:
   user_registration: true
   email_verification: true
@@ -143,6 +151,7 @@ storage:
     bucket_name: "techinsight"
     public_url: "https://minio.techinsightsworld.com"
 external:
+  auth_grpc_endpoint: "be-auth-service:50051"
   storage:
     provider: "minio"
     local:

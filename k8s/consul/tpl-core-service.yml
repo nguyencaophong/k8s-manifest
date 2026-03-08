@@ -98,7 +98,7 @@ websocket:
     - "https://techinsightsworld.com"
 auth:
   grpc:
-    addr: "be-auth-service:50052"
+    addr: "be-auth-service:50051"
 features:
   user_registration: true
   email_verification: true
