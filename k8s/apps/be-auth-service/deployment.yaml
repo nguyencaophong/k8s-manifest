@@ -62,9 +62,9 @@ spec:
               memory: "256Mi"
               cpu: "300m"
           ports:
-            - containerPort: 50051
+            - containerPort: 8081
               name: http
-            - containerPort: 50052
+            - containerPort: 50051
               name: grpc
           env:
             - name: CONFIG_FILEPATH
@@ -103,10 +103,11 @@ spec:
   selector:
     app: be-auth-service
   ports:
-    - port: 50051
+    - name: http
+      port: 8081
+      targetPort: 8081
+    - name: grpc
+      appProtocol: grpc
+      port: 50051
       targetPort: 50051
-      name: http
-    - port: 50052
-      targetPort: 50052
-      name: grpc
   type: ClusterIP

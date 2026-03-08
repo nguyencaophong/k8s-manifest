@@ -1,5 +1,39 @@
 # Requires Kong Ingress Controller installed (e.g. helm install kong kong/kong -n kong).
 # Apply after Kong is running; set ingressClassName to the one provided by your Kong install.
+# CORS plugin: trả CORS headers cho preflight (OPTIONS) và response (techinsightsworld.com -> api.techinsightsworld.com).
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: techinsight-cors
+  namespace: techinsight
+plugin: cors
+config:
+  origins:
+    - "https://techinsightsworld.com"
+    - "https://www.techinsightsworld.com"
+    - "https://admin.techinsightsworld.com"
+    - "http://localhost:3000"
+    - "http://localhost:3001"
+    - "http://localhost:5173"
+  methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "PATCH"
+    - "DELETE"
+    - "OPTIONS"
+  headers:
+    - "Content-Type"
+    - "Authorization"
+    - "X-Requested-With"
+    - "X-Trace-Id"
+  exposed_headers:
+    - "X-Total-Count"
+  credentials: true
+  max_age: 3600
+  preflight_continue: false
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,6 +41,7 @@ metadata:
   namespace: techinsight
   annotations:
     konghq.com/strip-path: "false"
+    konghq.com/plugins: techinsight-cors
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: kong
