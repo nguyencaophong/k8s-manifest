@@ -1,0 +1,79 @@
+{{- with secret "secret/data/modami/be-modami-auth-service" }}
+app:
+  name: "be-modami-auth-service"
+  version: "1.0.0"
+  environment: "production"
+
+server:
+  port: 8085
+  shutdown_timeout: "15s"
+
+postgres:
+  host: "postgresql.modami.svc.cluster.local"
+  port: 5432
+  schema: public
+  user_reader: "{{ .Data.data.postgres_user }}"
+  password_reader: "{{ .Data.data.postgres_password }}"
+  user_writer: "{{ .Data.data.postgres_user }}"
+  password_writer: "{{ .Data.data.postgres_password }}"
+  database: "be-modami-auth-service"
+  sslmode: ""
+  max_idle_conns: 5
+  max_active_conns: 25
+  max_conn_timeout: 10m
+  debug_log: false
+
+redis:
+  host: "redis.techinsight.svc.cluster.local"
+  port: 6379
+  database: 1
+  rate_limit_database: 5
+  ttl: 259200s
+  pool_size: 100
+  pass: "{{ .Data.data.redis_password }}"
+  user_name: ""
+  write_timeout: 600s
+  read_timeout: 600s
+  dial_timeout: 600s
+  tls_config:
+    insecure_skip_verify: true
+
+kafka:
+  broker_list: "techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092"
+  enable: true
+  tls_enable: false
+  partition: 1
+  partitioner: "random"
+  sasl_producer_username: ""
+  sasl_producer_password: ""
+  sasl_consumer_username: ""
+  sasl_consumer_password: ""
+  user_activated_topic_name: "modami.auth.user.activated"
+
+keycloak:
+  base_url: "{{ .Data.data.keycloak_base_url }}"
+  realm: "modami-api"
+  client_id: "modami-api"
+  client_secret: "{{ .Data.data.keycloak_client_secret }}"
+  admin_user: "{{ .Data.data.keycloak_admin_user }}"
+  admin_pass: "{{ .Data.data.keycloak_admin_pass }}"
+  redirect_url: "{{ .Data.data.keycloak_redirect_url }}"
+  frontend_callback_url: "{{ .Data.data.keycloak_frontend_callback_url }}"
+
+log:
+  level: "info"
+  format: "json"
+
+email:
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "{{ .Data.data.email_smtp_username }}"
+    password: "{{ .Data.data.email_smtp_password }}"
+    from_email: "{{ .Data.data.email_from }}"
+    from_name: "Modami"
+  templates:
+    welcome: "./templates/email/welcome.html"
+    password_reset: "./templates/email/password_reset.html"
+    verification: "./templates/email/verification.html"
+{{- end }}

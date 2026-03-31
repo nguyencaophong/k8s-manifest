@@ -1,35 +1,11 @@
-# ArgoCD Image Updater v1.1.1 - CRD-based configuration
+# ArgoCD Image Updater - thêm vào ArgoCD hiện có
 # Watches DockerHub for new pushes on :latest tag.
-# Strategy: latest - re-syncs whenever the :latest tag points to a new image.
-# Write-back: argocd - patches the live ArgoCD Application parameter directly.
-#
-
----
-# Backend API Service
-apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-kind: ImageUpdater
-metadata:
-  name: techinsight-be-api-service
-  namespace: argocd
-spec:
-  writeBackConfig:
-    method: argocd
-  commonUpdateSettings:
-    updateStrategy: newest-build
-  applicationRefs:
-    - namePattern: techinsight-be-api-service
-      images:
-        - alias: api
-          imageName: lifegoeson34/techinsight-core-service:latest
-          manifestTargets:
-            kustomize:
-              name: lifegoeson34/techinsight-core-service
 ---
 # Backend Auth Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
-  name: techinsight-be-auth-service
+  name: modami-be-modami-auth-service
   namespace: argocd
 spec:
   writeBackConfig:
@@ -37,19 +13,19 @@ spec:
   commonUpdateSettings:
     updateStrategy: newest-build
   applicationRefs:
-    - namePattern: techinsight-be-auth-service
+    - namePattern: modami-be-modami-auth-service
       images:
         - alias: auth
-          imageName: lifegoeson34/techinsight-auth-service:latest
+          imageName: lifegoeson34/be-modami-auth-service:latest
           manifestTargets:
             kustomize:
-              name: lifegoeson34/techinsight-auth-service
+              name: lifegoeson34/be-modami-auth-service
 ---
-# Backend Worker Service
+# Backend User Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
-  name: techinsight-be-worker-service
+  name: modami-be-modami-user-service
   namespace: argocd
 spec:
   writeBackConfig:
@@ -57,19 +33,19 @@ spec:
   commonUpdateSettings:
     updateStrategy: newest-build
   applicationRefs:
-    - namePattern: techinsight-be-worker-service
+    - namePattern: modami-be-modami-user-service
       images:
-        - alias: worker
-          imageName: lifegoeson34/techinsight-core-service:latest
+        - alias: user
+          imageName: lifegoeson34/be-modami-user-service:latest
           manifestTargets:
             kustomize:
-              name: lifegoeson34/techinsight-core-service
+              name: lifegoeson34/be-modami-user-service
 ---
-# Frontend Web Service
+# Backend Core Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
-  name: techinsight-fe-service
+  name: modami-be-modami-core-service
   namespace: argocd
 spec:
   writeBackConfig:
@@ -77,30 +53,10 @@ spec:
   commonUpdateSettings:
     updateStrategy: newest-build
   applicationRefs:
-    - namePattern: techinsight-fe-service
+    - namePattern: modami-be-modami-core-service
       images:
-        - alias: web
-          imageName: lifegoeson34/techinsight-web:latest
+        - alias: core
+          imageName: lifegoeson34/be-modami-core-service:latest
           manifestTargets:
             kustomize:
-              name: lifegoeson34/techinsight-web
----
-# Frontend Admin Service
-apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-kind: ImageUpdater
-metadata:
-  name: techinsight-fe-admin-service
-  namespace: argocd
-spec:
-  writeBackConfig:
-    method: argocd
-  commonUpdateSettings:
-    updateStrategy: newest-build
-  applicationRefs:
-    - namePattern: techinsight-fe-admin-service
-      images:
-        - alias: admin
-          imageName: lifegoeson34/techinsight-admin:latest
-          manifestTargets:
-            kustomize:
-              name: lifegoeson34/techinsight-admin
+              name: lifegoeson34/be-modami-core-service

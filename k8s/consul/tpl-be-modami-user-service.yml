@@ -1,0 +1,68 @@
+{{- with secret "secret/data/modami/be-modami-user-service" }}
+app:
+  name: "be-modami-user-service"
+  version: "1.0.0"
+  environment: "production"
+
+server:
+  port: "8086"
+
+grpc:
+  port: "50050"
+
+postgres:
+  host: "postgresql.modami.svc.cluster.local"
+  port: 5432
+  schema: public
+  user_reader: "{{ .Data.data.postgres_user }}"
+  password_reader: "{{ .Data.data.postgres_password }}"
+  user_writer: "{{ .Data.data.postgres_user }}"
+  password_writer: "{{ .Data.data.postgres_password }}"
+  database: "be-modami-user-service"
+  sslmode: ""
+  max_idle_conns: 5
+  max_active_conns: 25
+  max_conn_timeout: 10m
+  debug_log: false
+
+redis:
+  host: "redis.techinsight.svc.cluster.local"
+  port: 6379
+  database: 2
+  rate_limit_database: 6
+  ttl: 259200s
+  pool_size: 100
+  pass: "{{ .Data.data.redis_password }}"
+  user_name: ""
+  write_timeout: 600s
+  read_timeout: 600s
+  dial_timeout: 600s
+  tls_config:
+    insecure_skip_verify: true
+
+kafka:
+  broker_list: "techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092"
+  enable: true
+  tls_enable: false
+  partition: 1
+  partitioner: "random"
+  sasl_producer_username: ""
+  sasl_producer_password: ""
+  sasl_consumer_username: ""
+  sasl_consumer_password: ""
+  user_activated_topic_name: "modami.auth.user.activated"
+  consumer_group: "user-service-group"
+  client_id: "user-service"
+  env: "production"
+
+keycloak:
+  jwks_url: "{{ .Data.data.keycloak_jwks_url }}"
+
+observability:
+  service_name: "user-service"
+  service_version: "1.0.0"
+  environment: "production"
+  log_level: "info"
+  otlp_endpoint: "otel-collector.techinsight.svc.cluster.local:4317"
+  otlp_insecure: true
+{{- end }}

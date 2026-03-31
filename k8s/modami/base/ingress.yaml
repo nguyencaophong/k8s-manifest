@@ -1,0 +1,112 @@
+# ExternalName services trong techinsight namespace trỏ sang modami namespace
+# Kong Ingress Controller chỉ route tới services cùng namespace với Ingress
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: modami-auth-proxy
+  namespace: techinsight
+spec:
+  type: ExternalName
+  externalName: be-modami-auth-service.modami.svc.cluster.local
+  ports:
+    - name: http
+      port: 8085
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: modami-user-proxy
+  namespace: techinsight
+spec:
+  type: ExternalName
+  externalName: be-modami-user-service.modami.svc.cluster.local
+  ports:
+    - name: http
+      port: 8086
+    - name: grpc
+      port: 50050
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: modami-core-proxy
+  namespace: techinsight
+spec:
+  type: ExternalName
+  externalName: be-modami-core-service.modami.svc.cluster.local
+  ports:
+    - name: http
+      port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: modami-keycloak-proxy
+  namespace: techinsight
+spec:
+  type: ExternalName
+  externalName: keycloak.modami.svc.cluster.local
+  ports:
+    - name: http
+      port: 8180
+---
+# Ingress trong techinsight namespace (cùng namespace với Kong)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: modami-ingress
+  namespace: techinsight
+  annotations:
+    konghq.com/strip-path: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - modami-auth.techinsightsworld.com
+        - modami-user.techinsightsworld.com
+        - modami-core.techinsightsworld.com
+        - keycloak.techinsightsworld.com
+      secretName: modami-tls
+  rules:
+    - host: modami-auth.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: modami-auth-proxy
+                port:
+                  number: 8085
+    - host: keycloak.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: modami-keycloak-proxy
+                port:
+                  number: 8180
+    - host: modami-user.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: modami-user-proxy
+                port:
+                  number: 8086
+    - host: modami-core.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: modami-core-proxy
+                port:
+                  number: 8080

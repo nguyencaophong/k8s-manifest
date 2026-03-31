@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Load TechInsight config (environment) into Consul KV.
+# Load Modami config (environment) into Consul KV.
 # Usage 1 (Consul CLI local): CONSUL_HTTP_ADDR=http://localhost:8500 ./load-config-into-consul.sh
 # Usage 2 (không cài consul CLI): dùng kubectl exec vào pod Consul trong cluster:
 #   ./load-config-into-consul.sh
@@ -43,9 +43,9 @@ put_value() {
   echo "Loaded $key"
 }
 
-put_file "techinsight/templates/be-api-service" "tpl-be-api-service.yml"
-put_file "techinsight/templates/be-auth-service" "tpl-be-auth-service.yml"
-put_file "techinsight/templates/be-worker-service" "tpl-be-worker-service.yml"
+put_file "modami/templates/be-modami-auth-service" "tpl-be-modami-auth-service.yml"
+put_file "modami/templates/be-modami-user-service" "tpl-be-modami-user-service.yml"
+put_file "modami/templates/be-modami-core-service" "tpl-be-modami-core-service.yml"
 
 echo "Done. Templates loaded into Consul KV (consul-template sẽ merge với Vault secrets)."
-echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse techinsight/"
+echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse modami/"

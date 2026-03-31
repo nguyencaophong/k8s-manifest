@@ -1,0 +1,36 @@
+# PodDisruptionBudget - avoid evicting all replicas at once during node drain / upgrade
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-modami-auth-service-pdb
+  namespace: modami
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-modami-auth-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-modami-user-service-pdb
+  namespace: modami
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-modami-user-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-modami-core-service-pdb
+  namespace: modami
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-modami-core-service
+---
+# Note: With replicas=1, minAvailable: 1 means no voluntary eviction until another replica is ready.
+# Increase replicas (e.g. to 2) for real HA.
