@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: modami-be-modami-upload-service
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: modami
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
+    targetRevision: HEAD
+    path: k8s/apps/be-modami-upload-service
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: modami
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true

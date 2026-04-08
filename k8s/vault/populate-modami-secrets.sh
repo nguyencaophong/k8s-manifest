@@ -66,7 +66,31 @@ vault kv put secret/modami/be-modami-core-service \
   elasticsearch_user="$ELASTICSEARCH_USER" \
   elasticsearch_password="$ELASTICSEARCH_PASSWORD"
 
+POSTGRES_USER_UPLOAD="${POSTGRES_USER_UPLOAD:-postgres}"
+POSTGRES_PASSWORD_UPLOAD="${POSTGRES_PASSWORD_UPLOAD:-postgres_password}"
+REDIS_CACHE_PASSWORD="${REDIS_CACHE_PASSWORD:-}"
+VIMEO_CLIENT_ID="${VIMEO_CLIENT_ID:-}"
+VIMEO_CLIENT_SECRET="${VIMEO_CLIENT_SECRET:-}"
+VIMEO_ACCESS_TOKEN="${VIMEO_ACCESS_TOKEN:-}"
+AWS_COGNITO_POOL_ID="${AWS_COGNITO_POOL_ID:-}"
+KAFKA_SASL_USERNAME_UPLOAD="${KAFKA_SASL_USERNAME_UPLOAD:-}"
+KAFKA_SASL_PASSWORD_UPLOAD="${KAFKA_SASL_PASSWORD_UPLOAD:-}"
+
+vault kv put secret/modami/be-modami-upload-service \
+  postgres_user="$POSTGRES_USER_UPLOAD" \
+  postgres_password="$POSTGRES_PASSWORD_UPLOAD" \
+  minio_access_key="$MINIO_ACCESS_KEY" \
+  minio_secret_key="$MINIO_SECRET_KEY" \
+  redis_cache_password="$REDIS_CACHE_PASSWORD" \
+  vimeo_client_id="$VIMEO_CLIENT_ID" \
+  vimeo_client_secret="$VIMEO_CLIENT_SECRET" \
+  vimeo_access_token="$VIMEO_ACCESS_TOKEN" \
+  aws_cognito_pool_id="$AWS_COGNITO_POOL_ID" \
+  kafka_sasl_username="$KAFKA_SASL_USERNAME_UPLOAD" \
+  kafka_sasl_password="$KAFKA_SASL_PASSWORD_UPLOAD"
+
 echo "Done. Secrets at:"
 echo "  secret/modami/be-modami-auth-service"
 echo "  secret/modami/be-modami-user-service"
 echo "  secret/modami/be-modami-core-service"
+echo "  secret/modami/be-modami-upload-service"

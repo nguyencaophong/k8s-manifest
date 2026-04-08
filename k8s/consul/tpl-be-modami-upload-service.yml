@@ -1,0 +1,91 @@
+{{- with secret "secret/data/modami/be-modami-upload-service" }}
+NODE_ENV=production
+PORT=8088
+
+# ─── PostgreSQL ───────────────────────────────────────────────────────────────
+POSTGRES_CONNECTION=postgres
+POSTGRES_HOST=postgresql.modami.svc.cluster.local
+POSTGRES_PORT=5432
+POSTGRES_USER={{ .Data.data.postgres_user }}
+POSTGRES_PASSWORD={{ .Data.data.postgres_password }}
+POSTGRES_SCHEMA=public
+POSTGRES_DB=be-modami-upload-service
+POSTGRES_POOL_MIN=1
+POSTGRES_POOL_MAX=25
+POSTGRES_POOL_IDLE=10000
+
+# ─── MinIO (S3-compatible object storage) ────────────────────────────────────
+MINIO_ENDPOINT=http://minio.techinsight.svc.cluster.local:9000
+MINIO_REGION=us-east-1
+MINIO_ACCESS_KEY={{ .Data.data.minio_access_key }}
+MINIO_SECRET_KEY={{ .Data.data.minio_secret_key }}
+MINIO_VIDEOS_BUCKET=videos
+MINIO_IMAGES_BUCKET=images
+MINIO_FILES_BUCKET=files
+MINIO_EKYC_BUCKET=ekyc
+
+# ─── Swagger ──────────────────────────────────────────────────────────────────
+SWAGGER_ENABLE=false
+SWAGGER_API_BASE_PATH=/
+
+# ─── Kafka ────────────────────────────────────────────────────────────────────
+KAFKA_CLIENT_ID=be-modami-upload-service
+KAFKA_BOOTSTRAP_SERVERS=techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092
+KAFKA_CONSUMER_GROUP_ID=be-modami-upload-service
+KAFKA_SASL_MECHANISMS=plain
+KAFKA_SASL_USERNAME={{ .Data.data.kafka_sasl_username }}
+KAFKA_SASL_PASSWORD={{ .Data.data.kafka_sasl_password }}
+KAFKA_ENV=production
+KAFKAJS_NO_PARTITIONER_WARNING=1
+KAFKA_SSL_CERT=
+KAFKA_SSL_KEY=
+KAFKA_SSL_CA=
+
+# ─── Vimeo ────────────────────────────────────────────────────────────────────
+VIMEO_CLIENT_ID={{ .Data.data.vimeo_client_id }}
+VIMEO_CLIENT_SECRET={{ .Data.data.vimeo_client_secret }}
+VIMEO_ACCESS_TOKEN={{ .Data.data.vimeo_access_token }}
+
+# ─── HLS ──────────────────────────────────────────────────────────────────────
+HLS_PREFIX_URL=https://modami-upload.techinsightsworld.com/hls/
+
+# ─── AWS Cognito ──────────────────────────────────────────────────────────────
+AWS_COGNITO_REGION=ap-southeast-1
+AWS_COGNITO_POOL_ID={{ .Data.data.aws_cognito_pool_id }}
+
+# ─── File size limits ─────────────────────────────────────────────────────────
+MAX_VIDEO_SIZE_IN_MB=100
+MAX_FILE_SIZE_IN_MB=100
+MAX_IMAGE_SIZE_IN_MB=25
+
+# ─── Temp storage ─────────────────────────────────────────────────────────────
+TEMP_PATH=/tmp
+
+# ─── Health check ─────────────────────────────────────────────────────────────
+HEALTH_CHECK_STORAGE_THRESHOLD_PERCENT=0.95
+HEALTH_CHECK_STORAGE_THRESHOLD_IN_BYTE=1073741824
+
+# ─── SQS (AWS) ────────────────────────────────────────────────────────────────
+SQS_ENABLED=false
+AWS_S3_SQS_RESIZE_IMAGE_QUEUE_URL=
+AWS_S3_SQS_VIDEO_QUEUE_URL=
+
+# ─── Image proxy / CDN ────────────────────────────────────────────────────────
+IMAGE_PROXY_URL=http://imgproxy.techinsight.svc.cluster.local:8080
+IMAGE_CDN_URL=http://minio.techinsight.svc.cluster.local:9000
+USER_SERVICE_URL=http://be-modami-user-service.modami.svc.cluster.local:8087
+
+IMAGE_ANIMATION_LIMIT_IN_MB=5
+IMAGE_ANIMATION_MAX_RESOLUTION_IN_MEGAPIXELS=1
+IMAGE_MAX_ANIMATION_FRAMES=100
+IMAGE_MAX_RESOLUTION_IN_MEGAPIXELS=135
+
+# ─── Redis ────────────────────────────────────────────────────────────────────
+REDIS_CACHE_CLUSTER_NODES=
+REDIS_CACHE_HOST=redis.techinsight.svc.cluster.local
+REDIS_CACHE_PORT=6379
+REDIS_CACHE_USERNAME=
+REDIS_CACHE_PASSWORD={{ .Data.data.redis_cache_password }}
+REDIS_CACHE_TLS=false
+REDIS_CACHE_PREFIX=be-modami-upload-service
+{{- end }}

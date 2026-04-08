@@ -7,7 +7,7 @@ set -e
 cd "$(dirname "$0")"
 
 # Policies
-for app in be-modami-auth-service be-modami-user-service be-modami-core-service; do
+for app in be-modami-auth-service be-modami-user-service be-modami-core-service be-modami-upload-service; do
   policy_name="modami-${app}"
   vault policy write "$policy_name" "policies/modami-${app}.hcl"
   echo "Policy written: $policy_name"
@@ -30,6 +30,12 @@ vault write auth/kubernetes/role/be-modami-core-service \
   bound_service_account_names=be-modami-core-service \
   bound_service_account_namespaces=modami \
   policies=modami-be-modami-core-service \
+  ttl=1h
+
+vault write auth/kubernetes/role/be-modami-upload-service \
+  bound_service_account_names=be-modami-upload-service \
+  bound_service_account_namespaces=modami \
+  policies=modami-be-modami-upload-service \
   ttl=1h
 
 echo "Done. Vault roles bound to namespace=modami."
