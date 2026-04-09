@@ -6,7 +6,7 @@ metadata:
   labels:
     app: be-modami-noti-service-worker-push
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: be-modami-noti-service-worker-push
