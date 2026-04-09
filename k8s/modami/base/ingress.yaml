@@ -54,14 +54,26 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: modami-upload-proxy
+  name: modami-noti-api-proxy
   namespace: techinsight
 spec:
   type: ExternalName
-  externalName: be-modami-upload-service.modami.svc.cluster.local
+  externalName: be-modami-noti-service-api.modami.svc.cluster.local
   ports:
     - name: http
-      port: 8088
+      port: 7070
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: modami-noti-ws-proxy
+  namespace: techinsight
+spec:
+  type: ExternalName
+  externalName: be-modami-noti-service-ws-gateway.modami.svc.cluster.local
+  ports:
+    - name: http
+      port: 7072
 ---
 # Ingress trong techinsight namespace (cùng namespace với Kong)
 apiVersion: networking.k8s.io/v1
@@ -79,7 +91,8 @@ spec:
         - modami-auth.techinsightsworld.com
         - modami-user.techinsightsworld.com
         - modami-core.techinsightsworld.com
-        - modami-upload.techinsightsworld.com
+        - modami-noti.techinsightsworld.com
+        - modami-noti-ws.techinsightsworld.com
         - keycloak.techinsightsworld.com
       secretName: modami-tls
   rules:
@@ -123,13 +136,23 @@ spec:
                 name: modami-core-proxy
                 port:
                   number: 8080
-    - host: modami-upload.techinsightsworld.com
+    - host: modami-noti.techinsightsworld.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: modami-upload-proxy
+                name: modami-noti-api-proxy
                 port:
-                  number: 8088
+                  number: 7070
+    - host: modami-noti-ws.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: modami-noti-ws-proxy
+                port:
+                  number: 7072

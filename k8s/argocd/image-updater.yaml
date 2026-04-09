@@ -80,3 +80,103 @@ spec:
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-upload-service
+---
+# Noti Service API
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-noti-service-api
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-noti-service-api
+      images:
+        - alias: noti-api
+          imageName: lifegoeson34/be-modami-noti-service-api:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-noti-service-api
+---
+# Noti Service Ingest
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-noti-service-ingest
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-noti-service-ingest
+      images:
+        - alias: noti-ingest
+          imageName: lifegoeson34/be-modami-noti-service-ingest:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-noti-service-ingest
+---
+# Noti Service WS Gateway
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-noti-service-ws-gateway
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-noti-service-ws-gateway
+      images:
+        - alias: noti-ws-gateway
+          imageName: lifegoeson34/be-modami-noti-service-ws-gateway:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-noti-service-ws-gateway
+---
+# Noti Service Worker Dispatch
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-noti-service-worker-dispatch
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-noti-service-worker-dispatch
+      images:
+        - alias: noti-worker-dispatch
+          imageName: lifegoeson34/be-modami-noti-service-worker-dispatch:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-noti-service-worker-dispatch
+---
+# Noti Service Worker Push
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-noti-service-worker-push
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-noti-service-worker-push
+      images:
+        - alias: noti-worker-push
+          imageName: lifegoeson34/be-modami-noti-service-worker-push:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-noti-service-worker-push
