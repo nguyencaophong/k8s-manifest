@@ -1,3 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scylladb-rackdc
+  namespace: modami
+data:
+  cassandra-rackdc.properties: |
+    dc=dc1
+    rack=rack1
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -22,7 +32,7 @@ spec:
           args:
             - --seeds=scylladb-0.scylladb.modami.svc.cluster.local
             - --cluster-name=modami-chat
-            - --datacenter=dc1
+            - --endpoint-snitch=GossipingPropertyFileSnitch
             - --smp=1
             - --memory=512M
             - --overprovisioned=1
@@ -48,6 +58,9 @@ spec:
           volumeMounts:
             - name: scylla-data
               mountPath: /var/lib/scylla
+            - name: rackdc
+              mountPath: /etc/scylla/cassandra-rackdc.properties
+              subPath: cassandra-rackdc.properties
           readinessProbe:
             exec:
               command: ["/bin/sh", "-c", "nodetool status | grep -E '^UN'"]
@@ -62,6 +75,10 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 5
+      volumes:
+        - name: rackdc
+          configMap:
+            name: scylladb-rackdc
   volumeClaimTemplates:
     - metadata:
         name: scylla-data
