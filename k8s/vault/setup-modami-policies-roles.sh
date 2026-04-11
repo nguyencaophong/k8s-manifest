@@ -1,19 +1,33 @@
 #!/usr/bin/env bash
-# Thêm policies và roles cho Modami vào Vault hiện có (techinsight).
-# Chạy trên cùng Vault instance đã setup cho techinsight.
-# Usage: export VAULT_ADDR và VAULT_TOKEN, rồi chạy script này.
+# Setup Vault policies + Kubernetes auth roles for all Modami services.
+# Usage: export VAULT_ADDR and VAULT_TOKEN, then run this script.
 set -e
 
 cd "$(dirname "$0")"
 
-# Policies
+# ─── 1. Policies (file-based) ────────────────────────────────────────────────
 for app in be-modami-auth-service be-modami-user-service be-modami-core-service be-modami-upload-service centrifugo; do
   policy_name="modami-${app}"
   vault policy write "$policy_name" "policies/modami-${app}.hcl"
   echo "Policy written: $policy_name"
 done
 
-# Kubernetes auth roles - bind SA trong namespace modami
+# Noti services share one secret + policy
+echo "=== Writing noti shared secret ==="
+vault kv put secret/modami/be-modami-noti-service \
+  mongodb_uri="mongodb://mongodb.modami.svc.cluster.local:27017/?directConnection=true" \
+  redis_password="" \
+  centrifugo_api_key="CHANGE_ME" \
+  centrifugo_hmac_secret="CHANGE_ME"
+
+vault policy write be-modami-noti-service - <<'EOF'
+path "secret/data/modami/be-modami-noti-service" {
+  capabilities = ["read"]
+}
+EOF
+echo "Policy written: be-modami-noti-service"
+
+# ─── 2. Kubernetes auth roles ────────────────────────────────────────────────
 vault write auth/kubernetes/role/be-modami-auth-service \
   bound_service_account_names=be-modami-auth-service \
   bound_service_account_namespaces=modami \
@@ -44,4 +58,13 @@ vault write auth/kubernetes/role/centrifugo \
   policies=modami-centrifugo \
   ttl=1h
 
-echo "Done. Vault roles bound to namespace=modami."
+for svc in be-modami-noti-service-api be-modami-noti-service-ingest be-modami-noti-service-ws-gateway be-modami-noti-service-worker-dispatch be-modami-noti-service-worker-push; do
+  vault write auth/kubernetes/role/"${svc}" \
+    bound_service_account_names="${svc}" \
+    bound_service_account_namespaces=modami \
+    policies=be-modami-noti-service \
+    ttl=1h
+  echo "Role created: ${svc}"
+done
+
+echo "Done. All Vault roles bound to namespace=modami."
