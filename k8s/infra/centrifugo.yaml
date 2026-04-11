@@ -73,15 +73,13 @@ spec:
               readOnly: true
           command: ["/bin/sh", "-c", "exec centrifugo --config=/app/config/centrifugo.json"]
           livenessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8000
             initialDelaySeconds: 15
             periodSeconds: 15
             failureThreshold: 5
           readinessProbe:
-            httpGet:
-              path: /health
+            tcpSocket:
               port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
