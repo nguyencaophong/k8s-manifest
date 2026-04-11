@@ -88,15 +88,15 @@ spec:
   ingressClassName: kong
   tls:
     - hosts:
-        - modami-auth.techinsightsworld.com
-        - modami-user.techinsightsworld.com
-        - modami-core.techinsightsworld.com
-        - modami-noti.techinsightsworld.com
-        - modami-noti-ws.techinsightsworld.com
-        - keycloak.techinsightsworld.com
+        - auth.modami.cloud
+        - user.modami.cloud
+        - core.modami.cloud
+        - noti.modami.cloud
+        - ws.modami.cloud
+        - keycloak.modami.cloud
       secretName: modami-tls
   rules:
-    - host: modami-auth.techinsightsworld.com
+    - host: auth.modami.cloud
       http:
         paths:
           - path: /
@@ -106,7 +106,7 @@ spec:
                 name: modami-auth-proxy
                 port:
                   number: 8085
-    - host: keycloak.techinsightsworld.com
+    - host: keycloak.modami.cloud
       http:
         paths:
           - path: /
@@ -116,7 +116,7 @@ spec:
                 name: modami-keycloak-proxy
                 port:
                   number: 8180
-    - host: modami-user.techinsightsworld.com
+    - host: user.modami.cloud
       http:
         paths:
           - path: /
@@ -126,7 +126,7 @@ spec:
                 name: modami-user-proxy
                 port:
                   number: 8086
-    - host: modami-core.techinsightsworld.com
+    - host: core.modami.cloud
       http:
         paths:
           - path: /
@@ -136,7 +136,7 @@ spec:
                 name: modami-core-proxy
                 port:
                   number: 8080
-    - host: modami-noti.techinsightsworld.com
+    - host: noti.modami.cloud
       http:
         paths:
           - path: /
@@ -146,7 +146,7 @@ spec:
                 name: modami-noti-api-proxy
                 port:
                   number: 7070
-    - host: modami-noti-ws.techinsightsworld.com
+    - host: ws.modami.cloud
       http:
         paths:
           - path: /

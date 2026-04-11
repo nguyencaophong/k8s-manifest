@@ -21,3 +21,27 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - PruneLast=true
+---
+# ArgoCD Application: modami shared resources (namespace, secrets, serviceaccounts, ingress, pdb)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: modami-base
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: modami
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
+    targetRevision: HEAD
+    path: k8s/modami/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: modami
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
