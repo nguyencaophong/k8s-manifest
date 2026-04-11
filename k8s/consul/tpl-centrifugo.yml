@@ -1,0 +1,14 @@
+{{- with secret "secret/data/modami/centrifugo" }}
+{
+  "port": 8000,
+  "grpc_api": true,
+  "grpc_api_port": 10000,
+  "log_level": "info",
+  "log_format": "json",
+  "token_hmac_secret_key": "{{ .Data.data.token_hmac_secret_key }}",
+  "api_key": "{{ .Data.data.api_key }}",
+  "admin": true,
+  "admin_password": "{{ .Data.data.admin_password }}",
+  "admin_secret": "{{ .Data.data.admin_secret }}"
+}
+{{- end }}
