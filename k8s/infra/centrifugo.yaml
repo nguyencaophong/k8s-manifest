@@ -25,6 +25,7 @@ spec:
         vault.hashicorp.com/agent-inject-token: "true"
     spec:
       serviceAccountName: centrifugo
+      enableServiceLinks: false
       initContainers:
         - name: consul-template
           image: hashicorp/consul-template:0.37.6
