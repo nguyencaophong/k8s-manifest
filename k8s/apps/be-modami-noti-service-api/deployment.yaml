@@ -64,7 +64,6 @@ spec:
           ports:
             - containerPort: 7070
               name: http
-          command: ["./main"]
           volumeMounts:
             - name: config-output
               mountPath: /app/config

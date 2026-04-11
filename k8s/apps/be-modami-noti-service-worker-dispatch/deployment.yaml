@@ -61,7 +61,6 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "200m"
-          command: ["./main"]
           volumeMounts:
             - name: config-output
               mountPath: /app/config
