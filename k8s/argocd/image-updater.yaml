@@ -81,6 +81,26 @@ spec:
             kustomize:
               name: lifegoeson34/be-modami-upload-service
 ---
+# Chat Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: modami-be-modami-chat-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+  applicationRefs:
+    - namePattern: modami-be-modami-chat-service
+      images:
+        - alias: chat
+          imageName: lifegoeson34/be-modami-chat-service:latest
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-modami-chat-service
+---
 # Noti Service API
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
