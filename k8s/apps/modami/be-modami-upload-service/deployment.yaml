@@ -6,7 +6,7 @@ metadata:
   labels:
     app: be-modami-upload-service
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: be-modami-upload-service
