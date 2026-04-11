@@ -17,7 +17,7 @@ spec:
     targetRevision: HEAD
     path: k8s/argocd
     directory:
-      recurse: false
+      recurse: true
       exclude: '{install-argocd.sh,scale-argocd-server.sh,README.md,root-app.yaml}'
   destination:
     server: https://kubernetes.default.svc

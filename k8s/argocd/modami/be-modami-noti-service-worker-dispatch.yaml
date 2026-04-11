@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
-    path: k8s/apps/be-modami-noti-service-worker-dispatch
+    path: k8s/apps/modami/be-modami-noti-service-worker-dispatch
   destination:
     server: https://kubernetes.default.svc
     namespace: modami
