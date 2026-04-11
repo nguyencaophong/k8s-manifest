@@ -6,13 +6,13 @@ metadata:
   labels:
     app: be-modami-noti-service-ws-gateway
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: be-modami-noti-service-ws-gateway
   template:
     metadata:
-      labels:
+      labels:   
         app: be-modami-noti-service-ws-gateway
       annotations:
         vault.hashicorp.com/agent-inject: "true"
