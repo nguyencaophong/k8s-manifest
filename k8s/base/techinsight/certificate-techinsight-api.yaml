@@ -10,6 +10,13 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
+    group: cert-manager.io
   dnsNames:
     - api.techinsightsworld.com
     - admin.techinsightsworld.com
+    - minio.techinsightsworld.com
+    - kibana.techinsightsworld.com
+    - redpanda.techinsightsworld.com
+  usages:
+    - digital signature
+    - key encipherment
