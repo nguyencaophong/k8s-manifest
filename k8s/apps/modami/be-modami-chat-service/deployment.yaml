@@ -6,7 +6,7 @@ metadata:
   labels:
     app: be-modami-chat-service
 spec:
-  replicas: 0
+  replicas: 3
   selector:
     matchLabels:
       app: be-modami-chat-service
