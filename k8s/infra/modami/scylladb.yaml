@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: scylladb
+  namespace: modami
+  labels:
+    app: scylladb
+spec:
+  serviceName: scylladb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scylladb
+  template:
+    metadata:
+      labels:
+        app: scylladb
+    spec:
+      containers:
+        - name: scylladb
+          image: scylladb/scylla:6.2
+          args:
+            - --seeds=scylladb-0.scylladb.modami.svc.cluster.local
+            - --cluster-name=modami-chat
+            - --datacenter=dc1
+            - --smp=1
+            - --memory=512M
+            - --overprovisioned=1
+            - --api-address=0.0.0.0
+          ports:
+            - containerPort: 9042
+              name: cql
+            - containerPort: 9160
+              name: thrift
+            - containerPort: 7000
+              name: intra-node
+            - containerPort: 7001
+              name: intra-node-ssl
+            - containerPort: 10000
+              name: rest-api
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          volumeMounts:
+            - name: scylla-data
+              mountPath: /var/lib/scylla
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "nodetool status | grep -E '^UN'"]
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 10
+          livenessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "nodetool status"]
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: scylla-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scylladb
+  namespace: modami
+spec:
+  selector:
+    app: scylladb
+  ports:
+    - name: cql
+      port: 9042
+      targetPort: 9042
+    - name: thrift
+      port: 9160
+      targetPort: 9160
+    - name: rest-api
+      port: 10000
+      targetPort: 10000
+  type: ClusterIP
