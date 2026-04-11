@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: be-modami-noti-service-worker-push
+  name: centrifugo
   namespace: modami
   labels:
-    app: be-modami-noti-service-worker-push
+    app: centrifugo
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      app: be-modami-noti-service-worker-push
+      app: centrifugo
   template:
     metadata:
       labels:
-        app: be-modami-noti-service-worker-push
+        app: centrifugo
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
@@ -21,10 +21,10 @@ spec:
         vault.hashicorp.com/agent-limits-cpu: "50m"
         vault.hashicorp.com/agent-requests-mem: "32Mi"
         vault.hashicorp.com/agent-limits-mem: "64Mi"
-        vault.hashicorp.com/role: "be-modami-noti-service-worker-push"
+        vault.hashicorp.com/role: "centrifugo"
         vault.hashicorp.com/agent-inject-token: "true"
     spec:
-      serviceAccountName: be-modami-noti-service-worker-push
+      serviceAccountName: centrifugo
       initContainers:
         - name: consul-template
           image: hashicorp/consul-template:0.37.6
@@ -49,23 +49,59 @@ spec:
             - |
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
-              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/modami/templates/be-modami-noti-service?raw"
-              consul-template -template "/tmp/tpl.yml:/app/config/config.yaml" -once
+              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/modami/templates/centrifugo?raw"
+              consul-template -template "/tmp/tpl.yml:/app/config/centrifugo.json" -once
       containers:
-        - name: noti-worker-push
-          image: lifegoeson34/be-modami-noti-service-worker-push:latest
+        - name: centrifugo
+          image: centrifugo/centrifugo:v5
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "25m"
+              memory: "128Mi"
+              cpu: "50m"
             limits:
-              memory: "256Mi"
-              cpu: "200m"
-          command: ["./main"]
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+              name: http
+            - containerPort: 10000
+              name: grpc-api
           volumeMounts:
             - name: config-output
               mountPath: /app/config
               readOnly: true
+          command: ["/bin/sh", "-c", "exec centrifugo --config=/app/config/centrifugo.json"]
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 5
       volumes:
         - name: config-output
           emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: centrifugo
+  namespace: modami
+spec:
+  selector:
+    app: centrifugo
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+    - name: grpc-api
+      port: 10000
+      targetPort: 10000
+  type: ClusterIP

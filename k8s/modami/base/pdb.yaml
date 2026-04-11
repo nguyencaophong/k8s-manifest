@@ -43,5 +43,16 @@ spec:
     matchLabels:
       app: be-modami-upload-service
 ---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: centrifugo-pdb
+  namespace: modami
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: centrifugo
+---
 # Note: With replicas=1, minAvailable: 1 means no voluntary eviction until another replica is ready.
 # Increase replicas (e.g. to 2) for real HA.

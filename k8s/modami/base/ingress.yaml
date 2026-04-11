@@ -70,10 +70,10 @@ metadata:
   namespace: techinsight
 spec:
   type: ExternalName
-  externalName: be-modami-noti-service-ws-gateway.modami.svc.cluster.local
+  externalName: centrifugo.modami.svc.cluster.local
   ports:
     - name: http
-      port: 7072
+      port: 8000
 ---
 # Ingress trong techinsight namespace (cùng namespace với Kong)
 apiVersion: networking.k8s.io/v1
@@ -155,4 +155,4 @@ spec:
               service:
                 name: modami-noti-ws-proxy
                 port:
-                  number: 7072
+                  number: 8000
