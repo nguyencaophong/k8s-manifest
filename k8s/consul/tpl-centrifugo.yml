@@ -9,6 +9,35 @@
   "api_key": "{{ .Data.data.api_key }}",
   "admin": true,
   "admin_password": "{{ .Data.data.admin_password }}",
-  "admin_secret": "{{ .Data.data.admin_secret }}"
+  "admin_secret": "{{ .Data.data.admin_secret }}",
+  "namespaces": [
+    {
+      "name": "noti",
+      "presence": false,
+      "history_size": 20,
+      "history_ttl": "168h",
+      "recover": true,
+      "proxy_subscribe": true,
+      "proxy_subscribe_endpoint": "http://localhost:7072/centrifugo/subscribe",
+      "proxy_subscribe_timeout": "3s",
+      "proxy_publish": true,
+      "proxy_publish_endpoint": "http://localhost:7072/centrifugo/publish",
+      "proxy_publish_timeout": "3s"
+    },
+    {
+      "name": "chat",
+      "presence": true,
+      "join_leave": true,
+      "history_size": 100,
+      "history_ttl": "24h",
+      "recover": true,
+      "proxy_subscribe": true,
+      "proxy_subscribe_endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/subscribe",
+      "proxy_subscribe_timeout": "3s",
+      "proxy_publish": true,
+      "proxy_publish_endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/publish",
+      "proxy_publish_timeout": "3s"
+    }
+  ]
 }
 {{- end }}
