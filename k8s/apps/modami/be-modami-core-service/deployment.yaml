@@ -62,7 +62,7 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           ports:
-            - containerPort: 8080
+            - containerPort: 8087
               name: http
           volumeMounts:
             - name: config-output
@@ -71,13 +71,13 @@ spec:
           command: ["/bin/sh", "-c", "exec ./main"]
           livenessProbe:
             tcpSocket:
-              port: 8080
+              port: 8087
             initialDelaySeconds: 30
             periodSeconds: 15
             failureThreshold: 5
           readinessProbe:
             tcpSocket:
-              port: 8080
+              port: 8087
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 5
@@ -96,5 +96,5 @@ spec:
   ports:
     - name: http
       port: 8080
-      targetPort: 8080
+      targetPort: 8087
   type: ClusterIP
