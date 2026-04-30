@@ -6,7 +6,7 @@ app:
   debug: true
   port: 8085
   host: "0.0.0.0"
-  swagger_host: "api.modami.cloud"
+  swagger_host: "auth.modami.cloud"
   shutdown_timeout: "30s"
   read_timeout: "30s"
   write_timeout: "30s"
@@ -62,7 +62,7 @@ kafka:
 
 keycloak:
   base_url: "{{ .Data.data.keycloak_base_url }}"
-  realm: "modami-api"
+  realm: "modami"
   client_id: "modami-api"
   client_secret: "{{ .Data.data.keycloak_client_secret }}"
   admin_user: "{{ .Data.data.keycloak_admin_user }}"

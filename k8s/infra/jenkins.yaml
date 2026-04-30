@@ -1,0 +1,167 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: techinsight
+---
+# ClusterRole: chỉ cần quyền rollout restart deployments trên modami
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-deploy
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-deploy
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: jenkins-deploy
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: techinsight
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jenkins
+  namespace: techinsight
+  labels:
+    app: jenkins
+spec:
+  serviceName: jenkins
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      securityContext:
+        fsGroup: 1000
+      initContainers:
+        - name: install-kubectl
+          image: curlimages/curl:8.7.1
+          command:
+            - /bin/sh
+            - -c
+            - |
+              curl -sSL -o /tools/kubectl \
+                "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
+              chmod +x /tools/kubectl
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+        - name: install-docker-cli
+          image: docker:27-cli
+          command: ["cp", "/usr/local/bin/docker", "/tools/docker"]
+          volumeMounts:
+            - name: tools
+              mountPath: /tools
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:lts-jdk21
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "50m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 50000
+              name: agent
+          env:
+            - name: DOCKER_HOST
+              value: "tcp://localhost:2375"
+            - name: JAVA_OPTS
+              value: "-Xmx1536m -Xms512m"
+          volumeMounts:
+            - name: jenkins-data
+              mountPath: /var/jenkins_home
+            - name: tools
+              mountPath: /usr/local/bin/kubectl
+              subPath: kubectl
+            - name: tools
+              mountPath: /usr/local/bin/docker
+              subPath: docker
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: 8080
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            timeoutSeconds: 15
+            failureThreshold: 10
+        - name: dind
+          image: docker:27-dind
+          securityContext:
+            privileged: true
+          args: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "50m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: ""
+          volumeMounts:
+            - name: dind-storage
+              mountPath: /var/lib/docker
+      volumes:
+        - name: tools
+          emptyDir: {}
+        - name: dind-storage
+          emptyDir:
+            sizeLimit: 15Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: jenkins-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: techinsight
+spec:
+  selector:
+    app: jenkins
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+    - name: agent
+      port: 50000
+      targetPort: 50000
+  type: ClusterIP

@@ -20,6 +20,8 @@ spec:
         - minio.techinsightsworld.com
         - kibana.techinsightsworld.com
         - redpanda.techinsightsworld.com
+        - jenkins.techinsightsworld.com
+
       secretName: techinsight-api-tls
     - hosts:
         - techinsightsworld.com
@@ -101,5 +103,15 @@ spec:
             backend:
               service:
                 name: redpanda-console
+                port:
+                  number: 8080
+    - host: jenkins.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jenkins
                 port:
                   number: 8080

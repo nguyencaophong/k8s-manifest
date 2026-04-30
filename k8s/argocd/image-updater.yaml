@@ -1,5 +1,5 @@
-# ArgoCD Image Updater - thêm vào ArgoCD hiện có
-# Watches DockerHub for new pushes on :latest tag.
+# ArgoCD Image Updater - watches DockerHub for git-<sha> tags pushed by Jenkins
+# allowTags: regexp:^git- matches tags like git-abc1234
 ---
 # Backend Auth Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
@@ -12,11 +12,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-auth-service
       images:
         - alias: auth
-          imageName: lifegoeson34/be-modami-auth-service:latest
+          imageName: lifegoeson34/be-modami-auth-service
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-auth-service
@@ -32,11 +33,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-user-service
       images:
         - alias: user
-          imageName: lifegoeson34/be-modami-user-service:latest
+          imageName: lifegoeson34/be-modami-user-service
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-user-service
@@ -52,11 +54,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-core-service
       images:
         - alias: core
-          imageName: lifegoeson34/be-modami-core-service:latest
+          imageName: lifegoeson34/be-modami-core-service
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-core-service
@@ -72,11 +75,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-upload-service
       images:
         - alias: upload
-          imageName: lifegoeson34/be-modami-upload-service:latest
+          imageName: lifegoeson34/be-modami-upload-service
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-upload-service
@@ -92,11 +96,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-chat-service
       images:
         - alias: chat
-          imageName: lifegoeson34/be-modami-chat-service:latest
+          imageName: lifegoeson34/be-modami-chat-service
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-chat-service
@@ -112,11 +117,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-api
       images:
         - alias: noti-api
-          imageName: lifegoeson34/be-modami-noti-service-api:latest
+          imageName: lifegoeson34/be-modami-noti-service-api
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-api
@@ -132,11 +138,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-ingest
       images:
         - alias: noti-ingest
-          imageName: lifegoeson34/be-modami-noti-service-ingest:latest
+          imageName: lifegoeson34/be-modami-noti-service-ingest
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-ingest
@@ -152,11 +159,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-ws-gateway
       images:
         - alias: noti-ws-gateway
-          imageName: lifegoeson34/be-modami-noti-service-ws-gateway:latest
+          imageName: lifegoeson34/be-modami-noti-service-ws-gateway
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-ws-gateway
@@ -172,11 +180,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-worker-dispatch
       images:
         - alias: noti-worker-dispatch
-          imageName: lifegoeson34/be-modami-noti-service-worker-dispatch:latest
+          imageName: lifegoeson34/be-modami-noti-service-worker-dispatch
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-worker-dispatch
@@ -192,11 +201,12 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
+    allowTags: "regexp:^git-"
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-worker-push
       images:
         - alias: noti-worker-push
-          imageName: lifegoeson34/be-modami-noti-service-worker-push:latest
+          imageName: lifegoeson34/be-modami-noti-service-worker-push
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-worker-push

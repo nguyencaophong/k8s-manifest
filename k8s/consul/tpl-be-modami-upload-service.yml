@@ -25,7 +25,7 @@ MINIO_FILES_BUCKET=files
 MINIO_EKYC_BUCKET=ekyc
 
 # ─── Swagger ──────────────────────────────────────────────────────────────────
-SWAGGER_ENABLE=false
+SWAGGER_ENABLE=true
 SWAGGER_API_BASE_PATH=/
 
 # ─── Kafka ────────────────────────────────────────────────────────────────────

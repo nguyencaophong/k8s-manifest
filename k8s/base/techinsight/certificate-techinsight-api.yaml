@@ -17,6 +17,8 @@ spec:
     - minio.techinsightsworld.com
     - kibana.techinsightsworld.com
     - redpanda.techinsightsworld.com
+    - jenkins.techinsightsworld.com
+
   usages:
     - digital signature
     - key encipherment
