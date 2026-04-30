@@ -64,12 +64,15 @@ spec:
             - name: config-output
               mountPath: /app/config
               readOnly: true
+          workingDir: /usr/src/app
           command:
             - /bin/sh
             - -c
             - |
               set -a; . /app/config/.env; set +a
-              exec npx sequelize-cli db:migrate
+              npx sequelize-cli db:migrate --config sequelize/file/config.js --migrations-path sequelize/file/migrations
+              npx sequelize-cli db:migrate --config sequelize/image/config.js --migrations-path sequelize/image/migrations
+              npx sequelize-cli db:migrate --config sequelize/video/config.js --migrations-path sequelize/video/migrations
       containers:
         - name: upload
           image: lifegoeson34/be-modami-upload-service:latest
