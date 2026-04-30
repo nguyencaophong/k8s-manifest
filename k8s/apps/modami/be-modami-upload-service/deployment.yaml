@@ -51,6 +51,25 @@ spec:
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
               wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/modami/templates/be-modami-upload-service?raw"
               consul-template -template "/tmp/tpl.yml:/app/config/.env" -once
+        - name: migrate
+          image: lifegoeson34/be-modami-upload-service:latest
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: config-output
+              mountPath: /app/config
+              readOnly: true
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -a; . /app/config/.env; set +a
+              exec npx sequelize-cli db:migrate
       containers:
         - name: upload
           image: lifegoeson34/be-modami-upload-service:latest
