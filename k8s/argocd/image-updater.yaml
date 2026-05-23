@@ -1,6 +1,27 @@
 # ArgoCD Image Updater - watches DockerHub for git-<sha> tags pushed by Jenkins
 # allowTags: regexp:^git- matches tags like git-abc1234
 ---
+# MCP Server - watches lifegoeson34/mcp-server:latest by digest, redeploys on every new push
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: internal-mcp-server
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: digest
+    allowTags: "regexp:^latest$"
+  applicationRefs:
+    - namePattern: internal-mcp-server
+      images:
+        - alias: mcp-server
+          imageName: lifegoeson34/mcp-server
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/mcp-server
+---
 # Backend Auth Service
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
