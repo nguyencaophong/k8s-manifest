@@ -14,43 +14,8 @@ spec:
     metadata:
       labels:
         app: mcp-server
-      annotations:
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-init-first: "true"
-        vault.hashicorp.com/agent-requests-cpu: "10m"
-        vault.hashicorp.com/agent-limits-cpu: "50m"
-        vault.hashicorp.com/agent-requests-mem: "32Mi"
-        vault.hashicorp.com/agent-limits-mem: "64Mi"
-        vault.hashicorp.com/role: "mcp-server"
-        vault.hashicorp.com/agent-inject-token: "true"
     spec:
       serviceAccountName: mcp-server
-      initContainers:
-        - name: consul-template
-          image: hashicorp/consul-template:0.37.6
-          resources:
-            requests:
-              memory: "32Mi"
-              cpu: "10m"
-            limits:
-              memory: "64Mi"
-              cpu: "50m"
-          env:
-            - name: CONSUL_HTTP_ADDR
-              value: "http://consul-server.consul.svc.cluster.local:8500"
-            - name: VAULT_ADDR
-              value: "http://vault.vault.svc.cluster.local:8200"
-          volumeMounts:
-            - name: config-output
-              mountPath: /app/configs
-          command:
-            - /bin/sh
-            - -c
-            - |
-              export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
-              if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
-              wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/internal-mcp/templates/mcp-server?raw"
-              consul-template -template "/tmp/tpl.yml:/app/configs/config.yml" -once
       containers:
         - name: mcp-server
           image: lifegoeson34/mcp-server:latest
@@ -64,13 +29,9 @@ spec:
           ports:
             - containerPort: 3333
               name: http
-          env:
-            - name: CONFIG_FILEPATH
-              value: "/app/configs/config.yml"
-          volumeMounts:
-            - name: config-output
-              mountPath: /app/configs
-              readOnly: true
+          envFrom:
+            - secretRef:
+                name: mcp-server-env
           livenessProbe:
             tcpSocket:
               port: 3333
@@ -83,9 +44,6 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 5
-      volumes:
-        - name: config-output
-          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
