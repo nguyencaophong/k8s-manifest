@@ -5,6 +5,11 @@ metadata:
   namespace: argocd
   labels:
     app.kubernetes.io/part-of: internal-mcp
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: mcp-server=lifegoeson34/mcp-server:latest
+    argocd-image-updater.argoproj.io/mcp-server.update-strategy: digest
+    argocd-image-updater.argoproj.io/mcp-server.kustomize.image-name: lifegoeson34/mcp-server
+    argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
