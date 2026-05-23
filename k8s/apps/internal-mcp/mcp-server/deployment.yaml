@@ -14,8 +14,6 @@ spec:
     metadata:
       labels:
         app: mcp-server
-      annotations:
-        kubectl.kubernetes.io/restartedAt: "2026-05-23T09:40:00Z"
     spec:
       serviceAccountName: mcp-server
       containers:

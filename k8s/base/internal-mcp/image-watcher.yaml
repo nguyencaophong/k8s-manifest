@@ -31,30 +31,6 @@ subjects:
     name: mcp-image-watcher
     namespace: internal-mcp
 ---
-# Allow the watcher to patch the ArgoCD Application (cluster-scoped to avoid cross-namespace Role issues)
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: mcp-image-watcher-argocd
-rules:
-  - apiGroups: ["argoproj.io"]
-    resources: ["applications"]
-    resourceNames: ["internal-mcp-server"]
-    verbs: ["get", "patch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: mcp-image-watcher-argocd
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: mcp-image-watcher-argocd
-subjects:
-  - kind: ServiceAccount
-    name: mcp-image-watcher
-    namespace: internal-mcp
----
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -78,12 +54,10 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  # Get the digest currently pinned in the ArgoCD Application
-                  CURRENT=$(kubectl get application internal-mcp-server -n argocd \
-                    -o jsonpath='{.spec.source.kustomize.images[0]}' 2>/dev/null \
+                  CURRENT=$(kubectl get pods -n internal-mcp -l app=mcp-server \
+                    -o jsonpath='{.items[0].status.containerStatuses[0].imageID}' 2>/dev/null \
                     | sed 's/.*@//')
 
-                  # Get the latest digest from DockerHub for the latest tag
                   TOKEN=$(curl -s \
                     "https://auth.docker.io/token?service=registry.docker.io&scope=repository:lifegoeson34/mcp-server:pull" \
                     | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
@@ -94,7 +68,7 @@ spec:
                     "https://registry-1.docker.io/v2/lifegoeson34/mcp-server/manifests/latest" \
                     | grep -i "docker-content-digest" | awk '{print $2}' | tr -d '\r\n')
 
-                  echo "ArgoCD digest  : ${CURRENT:-unknown}"
+                  echo "Running digest : ${CURRENT:-unknown}"
                   echo "Registry digest: ${LATEST:-unknown}"
 
                   if [ -z "$LATEST" ]; then
@@ -103,11 +77,10 @@ spec:
                   fi
 
                   if [ "$CURRENT" != "$LATEST" ]; then
-                    echo "New image detected — patching ArgoCD Application"
-                    kubectl patch application internal-mcp-server -n argocd --type=json \
-                      -p="[{\"op\":\"replace\",\"path\":\"/spec/source/kustomize/images/0\",\"value\":\"lifegoeson34/mcp-server:latest@${LATEST}\"}]"
+                    echo "New image detected — triggering rollout restart"
+                    kubectl rollout restart deployment/mcp-server -n internal-mcp
                   else
-                    echo "Digest unchanged — no update needed"
+                    echo "Digest unchanged — no restart needed"
                   fi
               resources:
                 requests:
