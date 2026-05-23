@@ -15,7 +15,7 @@ spec:
     path: k8s/apps/internal-mcp/mcp-server
     kustomize:
       images:
-        - lifegoeson34/mcp-server:latest@sha256:48acffc2a2b9f26b6e5764ed597accb2a83d3ae44554d10977ae17c7f94f3fe5
+        - lifegoeson34/mcp-server:v1.0.dbb4dee@sha256:48acffc2a2b9f26b6e5764ed597accb2a83d3ae44554d10977ae17c7f94f3fe5
   destination:
     server: https://kubernetes.default.svc
     namespace: internal-mcp
