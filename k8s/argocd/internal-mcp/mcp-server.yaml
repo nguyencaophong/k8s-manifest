@@ -5,11 +5,6 @@ metadata:
   namespace: argocd
   labels:
     app.kubernetes.io/part-of: internal-mcp
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: mcp-server=lifegoeson34/mcp-server:latest
-    argocd-image-updater.argoproj.io/mcp-server.update-strategy: digest
-    argocd-image-updater.argoproj.io/mcp-server.kustomize.image-name: lifegoeson34/mcp-server
-    argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -18,6 +13,9 @@ spec:
     repoURL: https://github.com/nguyencaophong/k8s-manifest.git
     targetRevision: HEAD
     path: k8s/apps/internal-mcp/mcp-server
+    kustomize:
+      images:
+        - lifegoeson34/mcp-server:latest@sha256:74d0fb54cc15615542af2b711eaa054da44ec28750783275480356369c2fd565
   destination:
     server: https://kubernetes.default.svc
     namespace: internal-mcp

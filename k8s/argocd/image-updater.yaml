@@ -16,7 +16,7 @@ spec:
         - alias: mcp-server
           imageName: lifegoeson34/mcp-server
           commonUpdateSettings:
-            updateStrategy: newest-build
+            updateStrategy: digest
             allowTags: "regexp:^latest$"
           manifestTargets:
             kustomize:
