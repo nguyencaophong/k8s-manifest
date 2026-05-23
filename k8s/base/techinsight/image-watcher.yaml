@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-watcher
+  namespace: techinsight
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: image-watcher
+  namespace: techinsight
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: image-watcher
+  namespace: techinsight
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: image-watcher
+subjects:
+  - kind: ServiceAccount
+    name: image-watcher
+    namespace: techinsight
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: image-watcher
+  namespace: techinsight
+spec:
+  schedule: "*/2 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: image-watcher
+          restartPolicy: Never
+          containers:
+            - name: watcher
+              image: alpine/k8s:1.28.3
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  check_and_restart() {
+                    local IMAGE=$1
+                    shift
+                    local DEPLOYMENTS="$@"
+
+                    TOKEN=$(curl -s \
+                      "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${IMAGE}:pull" \
+                      | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+
+                    LATEST=$(curl -sI \
+                      -H "Authorization: Bearer $TOKEN" \
+                      -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+                      "https://registry-1.docker.io/v2/${IMAGE}/manifests/latest" \
+                      | grep -i "docker-content-digest" | awk '{print $2}' | tr -d '\r\n')
+
+                    if [ -z "$LATEST" ]; then
+                      echo "[${IMAGE}] Could not reach registry, skipping"
+                      return
+                    fi
+
+                    for DEPLOY in $DEPLOYMENTS; do
+                      CURRENT=$(kubectl get pods -n techinsight -l app=${DEPLOY} \
+                        -o jsonpath='{.items[0].status.containerStatuses[?(@.name!="consul-template")].imageID}' 2>/dev/null \
+                        | sed 's/.*@//')
+
+                      echo "[${DEPLOY}] running: ${CURRENT:-unknown} | registry: ${LATEST}"
+
+                      if [ "$CURRENT" != "$LATEST" ]; then
+                        echo "[${DEPLOY}] New image detected — triggering rollout restart"
+                        kubectl rollout restart deployment/${DEPLOY} -n techinsight
+                      fi
+                    done
+                  }
+
+                  check_and_restart "lifegoeson34/techinsight-core-service" "be-api-service" "be-worker-service"
+                  check_and_restart "lifegoeson34/techinsight-auth-service" "be-auth-service"
+                  check_and_restart "lifegoeson34/techinsight-admin"        "fe-admin-service"
+                  check_and_restart "lifegoeson34/techinsight-web"          "fe-service"
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "64Mi"
+                  cpu: "50m"
