@@ -122,6 +122,12 @@ security:
     expiration: "24h"
     refresh_expiration: "168h"
     issuer: "techinsight-api"
+  api_key:
+    hash: "{{ .Data.data.mcp_api_key_hash }}"
+    system_user_id: "{{ .Data.data.mcp_system_user_id }}"
+    system_username: "mcp-bot"
+    system_email: "mcp@techinsightsworld.com"
+    system_role: "editor"
   cookie:
     access_token_name: "access_token"
     refresh_token_name: "refresh_token"
