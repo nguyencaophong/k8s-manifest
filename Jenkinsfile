@@ -14,7 +14,25 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    triggers {
+        githubPush()
+        pollSCM('H/2 * * * *')
+    }
+
     stages {
+        stage('Pre-Cleanup') {
+            steps {
+                sh '''
+                    docker ps -aq | xargs -r docker stop || true
+                    docker ps -aq | xargs -r docker rm -f || true
+                    docker images -aq | xargs -r docker rmi -f || true
+                    docker volume ls -q | xargs -r docker volume rm -f || true
+                    docker builder prune -af || true
+                    docker network prune -f || true
+                '''
+            }
+        }
+
         stage('Discover Services') {
             steps {
                 script {
@@ -48,7 +66,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                branch 'main'
+                branch 'master'
             }
             steps {
                 script {
@@ -71,9 +89,12 @@ pipeline {
         always {
             sh '''
                 docker logout || true
-                docker system prune -af --volumes || true
+                docker ps -aq | xargs -r docker stop || true
+                docker ps -aq | xargs -r docker rm -f || true
+                docker images -aq | xargs -r docker rmi -f || true
+                docker volume ls -q | xargs -r docker volume rm -f || true
                 docker builder prune -af || true
-                docker volume prune -f || true
+                docker network prune -f || true
             '''
             cleanWs(deleteDirs: true, disableDeferredWipeout: true)
         }
@@ -97,8 +118,7 @@ def buildAndPush(String serviceName) {
 
         sh """
             docker build \
-                --pull \
-                --cache-from ${image}:latest \
+                --no-cache \
                 -t ${image}:${tag} \
                 -t ${image}:latest \
                 services/${serviceName}
