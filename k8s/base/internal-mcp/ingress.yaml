@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: internal-mcp-ingress
+  namespace: internal-mcp
+  annotations:
+    konghq.com/strip-path: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - mcp-server.techinsightsworld.com
+      secretName: internal-mcp-tls
+  rules:
+    - host: mcp-server.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mcp-server
+                port:
+                  number: 3333

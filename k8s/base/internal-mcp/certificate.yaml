@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-mcp-tls
+  namespace: internal-mcp
+spec:
+  secretName: internal-mcp-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - mcp-server.techinsightsworld.com

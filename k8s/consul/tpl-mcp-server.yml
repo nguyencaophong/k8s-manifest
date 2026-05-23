@@ -1,0 +1,8 @@
+{{- with secret "secret/data/internal-mcp/mcp-server" }}
+app:
+  port: 3333
+  environment: "production"
+
+secrets:
+  api_key: "{{ .Data.data.api_key }}"
+{{- end }}

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: internal-mcp-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: internal-mcp
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/nguyencaophong/k8s-manifest.git
+    targetRevision: HEAD
+    path: k8s/apps/internal-mcp/mcp-server
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: internal-mcp
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
