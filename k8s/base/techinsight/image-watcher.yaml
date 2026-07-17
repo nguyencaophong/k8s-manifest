@@ -76,7 +76,7 @@ spec:
 
                     for DEPLOY in $DEPLOYMENTS; do
                       CURRENT=$(kubectl get pods -n techinsight -l app=${DEPLOY} \
-                        -o jsonpath='{.items[0].status.containerStatuses[?(@.name!="consul-template")].imageID}' 2>/dev/null \
+                        -o jsonpath='{.items[0].status.containerStatuses[?(@.name!="vault-agent")].imageID}' 2>/dev/null \
                         | sed 's/.*@//')
 
                       echo "[${DEPLOY}] running: ${CURRENT:-unknown} | registry: ${LATEST}"
