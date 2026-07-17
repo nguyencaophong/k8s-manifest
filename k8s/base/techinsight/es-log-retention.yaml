@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: es-log-retention
+  namespace: techinsight
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: es-retention
+              image: alpine/k8s:1.28.3
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  RETENTION_DAYS=7
+                  for INDEX in techinsight-logs techinsight-traces; do
+                    echo "[${INDEX}] purging docs older than ${RETENTION_DAYS}d..."
+                    curl -s -X POST "http://elasticsearch.techinsight.svc.cluster.local:9200/${INDEX}/_delete_by_query?conflicts=proceed&wait_for_completion=true" \
+                      -H 'Content-Type: application/json' \
+                      -d "{\"query\":{\"range\":{\"@timestamp\":{\"lt\":\"now-${RETENTION_DAYS}d\"}}}}"
+                    echo
+                  done
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "100m"
