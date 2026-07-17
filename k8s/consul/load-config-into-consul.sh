@@ -48,6 +48,7 @@ put_file "modami/templates/be-modami-user-service" "tpl-be-modami-user-service.y
 put_file "modami/templates/be-modami-core-service" "tpl-be-modami-core-service.yml"
 put_file "modami/templates/be-modami-upload-service" "tpl-be-modami-upload-service.yml"
 put_file "modami/templates/be-modami-noti-service" "tpl-be-modami-noti-service.yml"
+put_file "modami/templates/be-modami-chat-service" "tpl-be-modami-chat-service.yml"
 put_file "modami/templates/centrifugo" "tpl-centrifugo.yml"
 
 put_file "techinsight/templates/be-api-service" "tpl-be-techinsight-api-service.yml"
