@@ -46,6 +46,8 @@ KEYCLOAK_JWKS_URL="${KEYCLOAK_JWKS_URL:-}"
 # Centrifugo
 CENTRIFUGO_API_KEY="${CENTRIFUGO_API_KEY:-CHANGE_ME}"
 CENTRIFUGO_HMAC_SECRET="${CENTRIFUGO_HMAC_SECRET:-CHANGE_ME}"
+CENTRIFUGO_ADMIN_PASSWORD="${CENTRIFUGO_ADMIN_PASSWORD:-CHANGE_ME}"
+CENTRIFUGO_ADMIN_SECRET="${CENTRIFUGO_ADMIN_SECRET:-CHANGE_ME}"
 
 echo "Writing Modami secrets to Vault..."
 
@@ -114,6 +116,12 @@ vault kv put secret/modami/be-modami-chat-service \
   centrifugo_api_key="$CENTRIFUGO_API_KEY" \
   centrifugo_hmac_secret="$CENTRIFUGO_HMAC_SECRET"
 
+vault kv put secret/modami/centrifugo \
+  api_key="$CENTRIFUGO_API_KEY" \
+  token_hmac_secret_key="$CENTRIFUGO_HMAC_SECRET" \
+  admin_password="$CENTRIFUGO_ADMIN_PASSWORD" \
+  admin_secret="$CENTRIFUGO_ADMIN_SECRET"
+
 echo "Done. Secrets at:"
 echo "  secret/modami/be-modami-auth-service"
 echo "  secret/modami/be-modami-user-service"
@@ -121,3 +129,4 @@ echo "  secret/modami/be-modami-core-service"
 echo "  secret/modami/be-modami-upload-service"
 echo "  secret/modami/be-modami-noti-service"
 echo "  secret/modami/be-modami-chat-service"
+echo "  secret/modami/centrifugo"
