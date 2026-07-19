@@ -6,7 +6,9 @@ metadata:
   labels:
     app: voice-analyze-and-summarizer-asr-summary-worker
 spec:
-  replicas: 1
+  # Disabled: crash-loops without OPENAI_API_KEY set in Vault. Set back to 1
+  # once secret/lingocast/voice-analyze-and-summarizer-asr openai_api_key is patched.
+  replicas: 0
   selector:
     matchLabels:
       app: voice-analyze-and-summarizer-asr-summary-worker
