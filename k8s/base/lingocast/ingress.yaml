@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lingocast-ingress
+  namespace: lingocast
+  annotations:
+    konghq.com/strip-path: "false"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - lingocast-core.modami.cloud
+      secretName: lingocast-tls
+  rules:
+    - host: lingocast-core.modami.cloud
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: be-lingocast-core-service
+                port:
+                  number: 8088

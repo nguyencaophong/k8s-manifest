@@ -1,0 +1,89 @@
+{{- with secret "secret/data/lingocast/be-lingocast-core-service" }}
+app:
+  name: "Lingocast core"
+  version: "1.0.0"
+  environment: "production"
+  debug: true
+  port: 8088
+  host: "0.0.0.0"
+  swagger_host: "lingocast-core.modami.cloud"
+  shutdown_timeout: "30s"
+  read_timeout: "30s"
+  write_timeout: "30s"
+  idle_timeout: "120s"
+  allow_credentials: true
+  allowed_origins:
+    - "http://localhost:5173"
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+    - "http://localhost:8081"
+
+keycloak:
+  jwks_url: "http://keycloak.modami.svc.cluster.local:8180/realms/lingocast/protocol/openid-connect/certs"
+
+mongodb:
+  uri: "{{ .Data.data.mongodb_uri }}"
+  database: "{{ .Data.data.mongodb_database }}"
+  timeout: 10s
+  max_pool_size: 100
+  min_pool_size: 0
+  max_idle_time: 900s
+  retry_writes: true
+  read_concern: "majority"
+  write_concern: "majority"
+  enable_logging: false
+
+redis:
+  host: "redis.techinsight.svc.cluster.local"
+  port: 6379
+  database: 8
+  rate_limit_database: 5
+  ttl: 259200s
+  pool_size: 100
+  pass: "{{ .Data.data.redis_password }}"
+  user_name: ""
+  write_timeout: 600s
+  read_timeout: 600s
+  dial_timeout: 600s
+  tls_config:
+    insecure_skip_verify: true
+
+kafka:
+  broker_list: "techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092"
+  enable: true
+  tls_enable: false
+  partition: 1
+  partitioner: "random"
+  sasl_producer_username: ""
+  sasl_producer_password: ""
+  sasl_consumer_username: ""
+  sasl_consumer_password: ""
+  consumer_group: "lingocast-core-service-group"
+  client_id: "lingocast-core-service"
+  env: "production"
+
+elasticsearch:
+  enable: false
+  url: ""
+  username: ""
+  password: ""
+  index: ""
+
+observability:
+  service_name: "lingocast-core-service"
+  service_version: "1.0.0"
+  environment: "production"
+  log_level: "info"
+  otlp_endpoint: "otel-collector.techinsight.svc.cluster.local:4317"
+  otlp_insecure: true
+
+minio:
+  endpoint: "minio.techinsight.svc.cluster.local:9000"
+  access_key: "{{ .Data.data.minio_access_key }}"
+  secret_key: "{{ .Data.data.minio_secret_key }}"
+  bucket: "lingocast"
+  use_ssl: false
+
+asynq:
+  concurrency: 10
+{{- end }}

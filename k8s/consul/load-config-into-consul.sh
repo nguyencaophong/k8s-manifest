@@ -51,6 +51,10 @@ put_file "modami/templates/be-modami-noti-service" "tpl-be-modami-noti-service.y
 put_file "modami/templates/be-modami-chat-service" "tpl-be-modami-chat-service.yml"
 put_file "modami/templates/centrifugo" "tpl-centrifugo.yml"
 
+put_file "lingocast/templates/be-lingocast-core-service" "tpl-be-lingocast-core-service.yml"
+put_file "lingocast/templates/be-lingocast-job-scheduler" "tpl-be-lingocast-job-scheduler.yml"
+put_file "lingocast/templates/voice-analyze-and-summarizer-asr" "tpl-voice-analyze-and-summarizer-asr.yml"
+
 put_file "techinsight/templates/be-api-service" "tpl-be-techinsight-api-service.yml"
 put_file "techinsight/templates/be-auth-service" "tpl-be-techinsight-auth-service.yml"
 put_file "techinsight/templates/be-worker-service" "tpl-be-techinsight-worker-service.yml"
@@ -59,4 +63,5 @@ put_file "techinsight/templates/mcp-server" "tpl-mcp-server.yml"
 
 echo "Done. Templates loaded into Consul KV (consul-template sẽ merge với Vault secrets)."
 echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse modami/"
+echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse lingocast/"
 echo "List keys: kubectl exec -n $CONSUL_NS $CONSUL_POD -c consul -- consul kv get -keys -recurse techinsight/"

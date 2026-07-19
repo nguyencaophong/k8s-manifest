@@ -1,0 +1,38 @@
+{{- with secret "secret/data/lingocast/voice-analyze-and-summarizer-asr" }}
+app:
+  name: "Lingocast ASR"
+  version: "1.0.0"
+  environment: "production"
+  debug: true
+
+# Placeholder topic names — adjust once the service's real config.yml is known.
+kafka:
+  broker_list: "techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092"
+  enable: true
+  tls_enable: false
+  partition: 1
+  sasl_producer_username: ""
+  sasl_producer_password: ""
+  sasl_consumer_username: ""
+  sasl_consumer_password: ""
+  consumer_group: "lingocast-asr-group"
+  client_id: "voice-analyze-and-summarizer-asr"
+  consume_topic: "lingocast.asr.requested"
+  produce_topic: "lingocast.asr.completed"
+  env: "production"
+
+minio:
+  endpoint: "minio.techinsight.svc.cluster.local:9000"
+  access_key: "{{ .Data.data.minio_access_key }}"
+  secret_key: "{{ .Data.data.minio_secret_key }}"
+  bucket: "lingocast"
+  use_ssl: false
+
+observability:
+  service_name: "voice-analyze-and-summarizer-asr"
+  service_version: "1.0.0"
+  environment: "production"
+  log_level: "info"
+  otlp_endpoint: "otel-collector.techinsight.svc.cluster.local:4317"
+  otlp_insecure: true
+{{- end }}

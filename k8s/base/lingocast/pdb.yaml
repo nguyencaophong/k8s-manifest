@@ -1,0 +1,36 @@
+# PodDisruptionBudget - avoid evicting all replicas at once during node drain / upgrade
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-lingocast-core-service-pdb
+  namespace: lingocast
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-lingocast-core-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: be-lingocast-job-scheduler-pdb
+  namespace: lingocast
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: be-lingocast-job-scheduler
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: voice-analyze-and-summarizer-asr-pdb
+  namespace: lingocast
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: voice-analyze-and-summarizer-asr
+---
+# Note: With replicas=1, minAvailable: 1 means no voluntary eviction until another replica is ready.
+# Increase replicas (e.g. to 2) for real HA.

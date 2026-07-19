@@ -231,3 +231,66 @@ spec:
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-noti-service-worker-push
+---
+# Lingocast Core Service
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: lingocast-be-lingocast-core-service
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+    allowTags: "regexp:^git-"
+  applicationRefs:
+    - namePattern: lingocast-be-lingocast-core-service
+      images:
+        - alias: core
+          imageName: lifegoeson34/be-lingocast-core-service
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-lingocast-core-service
+---
+# Lingocast Job Scheduler
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: lingocast-be-lingocast-job-scheduler
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+    allowTags: "regexp:^git-"
+  applicationRefs:
+    - namePattern: lingocast-be-lingocast-job-scheduler
+      images:
+        - alias: job-scheduler
+          imageName: lifegoeson34/be-lingocast-job-scheduler
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/be-lingocast-job-scheduler
+---
+# Lingocast Voice Analyze & Summarizer ASR (Python)
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+metadata:
+  name: lingocast-voice-analyze-and-summarizer-asr
+  namespace: argocd
+spec:
+  writeBackConfig:
+    method: argocd
+  commonUpdateSettings:
+    updateStrategy: newest-build
+    allowTags: "regexp:^git-"
+  applicationRefs:
+    - namePattern: lingocast-voice-analyze-and-summarizer-asr
+      images:
+        - alias: asr
+          imageName: lifegoeson34/voice-analyze-and-summarizer-asr
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/voice-analyze-and-summarizer-asr
