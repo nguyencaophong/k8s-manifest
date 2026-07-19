@@ -54,18 +54,26 @@ spec:
       containers:
         - name: summary-worker
           image: lifegoeson34/voice-analyze-and-summarizer-asr:latest
-          # Overrides only CMD; ENTRYPOINT stays /opt/nvidia/nvidia_entrypoint.sh so it still execs this.
-          args:
-            - python3
-            - -m
-            - workers.summary_worker
+          # workers/summary_worker.py reads os.getenv() directly (no load_dotenv()), so
+          # /app/.env must be sourced into real env vars before exec.
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -a
+              . /app/.env
+              set +a
+              exec python3 -m workers.summary_worker
           resources:
+            # cpu request kept minimal - node has almost no headroom (98% of 4 vCPU
+            # already requested by other workloads). This worker is I/O-bound
+            # (Kafka consume + OpenAI call), so a low request is reasonable.
             requests:
               memory: "256Mi"
-              cpu: "100m"
+              cpu: "10m"
             limits:
               memory: "1Gi"
-              cpu: "1000m"
+              cpu: "500m"
           volumeMounts:
             - name: config-output
               mountPath: /app/.env
