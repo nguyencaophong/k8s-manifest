@@ -50,7 +50,7 @@ spec:
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
               wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/lingocast/templates/voice-analyze-and-summarizer-asr?raw"
-              consul-template -template "/tmp/tpl.yml:/app/config/config.yaml" -once
+              consul-template -template "/tmp/tpl.yml:/app/config/.env" -once
       containers:
         - name: asr
           image: lifegoeson34/voice-analyze-and-summarizer-asr:latest
@@ -63,7 +63,8 @@ spec:
               cpu: "1000m"
           volumeMounts:
             - name: config-output
-              mountPath: /app/config
+              mountPath: /app/.env
+              subPath: .env
               readOnly: true
       volumes:
         - name: config-output

@@ -1,38 +1,32 @@
-{{- with secret "secret/data/lingocast/voice-analyze-and-summarizer-asr" }}
-app:
-  name: "Lingocast ASR"
-  version: "1.0.0"
-  environment: "production"
-  debug: true
+{{- with secret "secret/data/lingocast/voice-analyze-and-summarizer-asr" -}}
+FLASK_ENV=production
+SECRET_KEY={{ .Data.data.flask_secret_key }}
+PORT=5000
 
-# Placeholder topic names — adjust once the service's real config.yml is known.
-kafka:
-  broker_list: "techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092"
-  enable: true
-  tls_enable: false
-  partition: 1
-  sasl_producer_username: ""
-  sasl_producer_password: ""
-  sasl_consumer_username: ""
-  sasl_consumer_password: ""
-  consumer_group: "lingocast-asr-group"
-  client_id: "voice-analyze-and-summarizer-asr"
-  consume_topic: "lingocast.asr.requested"
-  produce_topic: "lingocast.asr.completed"
-  env: "production"
+MONGO_URI={{ .Data.data.mongodb_uri }}
 
-minio:
-  endpoint: "minio.techinsight.svc.cluster.local:9000"
-  access_key: "{{ .Data.data.minio_access_key }}"
-  secret_key: "{{ .Data.data.minio_secret_key }}"
-  bucket: "lingocast"
-  use_ssl: false
+KAFKA_BOOTSTRAP_SERVERS=techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092
+KAFKA_TRANSCRIPTION_REQUESTS=audio-transcription-requests
+KAFKA_TRANSCRIPTION_RESULTS=audio-transcription-results
+KAFKA_DIALOG_RESULTS=meeting-dialog-results
+KAFKA_SUMMARIES=meeting-summaries
 
-observability:
-  service_name: "voice-analyze-and-summarizer-asr"
-  service_version: "1.0.0"
-  environment: "production"
-  log_level: "info"
-  otlp_endpoint: "otel-collector.techinsight.svc.cluster.local:4317"
-  otlp_insecure: true
+MINIO_ENDPOINT=minio.techinsight.svc.cluster.local:9000
+MINIO_ACCESS_KEY={{ .Data.data.minio_access_key }}
+MINIO_SECRET_KEY={{ .Data.data.minio_secret_key }}
+MINIO_BUCKET=lingocast
+MINIO_SECURE=false
+
+CELERY_BROKER_URL={{ .Data.data.redis_url }}
+CELERY_RESULT_BACKEND={{ .Data.data.redis_url }}
+
+WHISPER_MODEL=base
+
+OPENAI_API_KEY={{ .Data.data.openai_api_key }}
+OPENAI_MODEL=gpt-4o
+OPENAI_MAX_TOKENS=2000
+OPENAI_TEMPERATURE=0.3
+
+VAD_AGGRESSIVENESS=2
+SESSION_TIMEOUT_MINUTES=30
 {{- end }}
