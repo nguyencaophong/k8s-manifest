@@ -10,10 +10,10 @@ spec:
   ingressClassName: kong
   tls:
     - hosts:
-        - lingocast-core.modami.cloud
+        - lingocast-api.modami.cloud
       secretName: lingocast-tls
   rules:
-    - host: lingocast-core.modami.cloud
+    - host: lingocast-api.modami.cloud
       http:
         paths:
           - path: /

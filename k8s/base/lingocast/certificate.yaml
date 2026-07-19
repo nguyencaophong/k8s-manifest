@@ -9,4 +9,4 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - lingocast-core.modami.cloud
+    - lingocast-api.modami.cloud
