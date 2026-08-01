@@ -56,6 +56,9 @@ spec:
           image: lifegoeson34/asr-worker:latest
           # workers/asr_worker.py reads os.getenv() directly (no load_dotenv()), so
           # /app/.env must be sourced into real env vars before exec.
+          # TEMP WORKAROUND: image was built without flask, but app/__init__.py
+          # (imported transitively via app.services) requires it. Install it into a
+          # writable dir at startup until the image is rebuilt with flask included.
           command:
             - /bin/sh
             - -c
@@ -63,6 +66,8 @@ spec:
               set -a
               . /app/.env
               set +a
+              pip install --quiet --target=/tmp/extra-pylibs flask
+              export PYTHONPATH="/tmp/extra-pylibs:${PYTHONPATH}"
               exec python -m workers.asr_worker
           resources:
             # cpu request kept minimal - node has almost no headroom (98% of 4 vCPU
