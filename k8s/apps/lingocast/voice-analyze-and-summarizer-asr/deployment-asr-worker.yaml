@@ -53,9 +53,9 @@ spec:
               consul-template -template "/tmp/tpl.yml:/app/config/.env" -once
       containers:
         - name: asr-worker
-          image: lifegoeson34/voice-analyze-and-summarizer-asr:latest
-          # celery_worker.py reads os.getenv() directly (no load_dotenv()), so /app/.env
-          # must be sourced into real env vars before exec, unlike the Flask API container.
+          image: lifegoeson34/asr-worker:latest
+          # workers/asr_worker.py reads os.getenv() directly (no load_dotenv()), so
+          # /app/.env must be sourced into real env vars before exec.
           command:
             - /bin/sh
             - -c
@@ -63,7 +63,7 @@ spec:
               set -a
               . /app/.env
               set +a
-              exec celery -A celery_worker worker --loglevel=info --pool=solo --concurrency=1
+              exec python -m workers.asr_worker
           resources:
             # cpu request kept minimal - node has almost no headroom (98% of 4 vCPU
             # already requested by other workloads). Limit stays high so it can

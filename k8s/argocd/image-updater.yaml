@@ -294,3 +294,13 @@ spec:
           manifestTargets:
             kustomize:
               name: lifegoeson34/voice-analyze-and-summarizer-asr
+        - alias: asr-worker
+          imageName: lifegoeson34/asr-worker
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/asr-worker
+        - alias: dialog-worker
+          imageName: lifegoeson34/dialog-worker
+          manifestTargets:
+            kustomize:
+              name: lifegoeson34/dialog-worker

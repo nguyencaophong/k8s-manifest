@@ -53,7 +53,7 @@ spec:
               consul-template -template "/tmp/tpl.yml:/app/config/.env" -once
       containers:
         - name: dialog-worker
-          image: lifegoeson34/voice-analyze-and-summarizer-asr:latest
+          image: lifegoeson34/dialog-worker:latest
           # workers/dialog_worker.py reads os.getenv() directly (no load_dotenv()), so
           # /app/.env must be sourced into real env vars before exec.
           command:
