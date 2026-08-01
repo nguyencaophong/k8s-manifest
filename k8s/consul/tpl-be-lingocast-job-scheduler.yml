@@ -4,6 +4,7 @@ app:
   version: "1.0.0"
   environment: "production"
   debug: true
+  ytdlp_cookies_file: "/app/config/yt-cookies.txt"
 
 mongodb:
   uri: "{{ .Data.data.mongodb_uri }}"
@@ -52,6 +53,13 @@ observability:
   log_level: "info"
   otlp_endpoint: "otel-collector.techinsight.svc.cluster.local:4317"
   otlp_insecure: true
+
+minio:
+  endpoint: "minio.techinsight.svc.cluster.local:9000"
+  access_key: "{{ .Data.data.minio_access_key }}"
+  secret_key: "{{ .Data.data.minio_secret_key }}"
+  bucket: "lingocast"
+  use_ssl: false
 
 asynq:
   concurrency: 10

@@ -1,0 +1,3 @@
+{{- with secret "secret/data/lingocast/be-lingocast-job-scheduler" -}}
+{{ .Data.data.ytdlp_cookies }}
+{{- end }}
