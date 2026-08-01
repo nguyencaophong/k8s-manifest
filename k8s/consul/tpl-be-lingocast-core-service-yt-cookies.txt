@@ -1,0 +1,3 @@
+{{- with secret "secret/data/lingocast/be-lingocast-core-service" -}}
+{{ .Data.data.ytdlp_cookies }}
+{{- end }}

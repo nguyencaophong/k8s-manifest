@@ -50,7 +50,8 @@ spec:
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
               wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/lingocast/templates/be-lingocast-core-service?raw"
-              consul-template -template "/tmp/tpl.yml:/app/config/config.yml" -once
+              wget -qO /tmp/tpl-cookies.yml "${CONSUL_HTTP_ADDR}/v1/kv/lingocast/templates/be-lingocast-core-service-yt-cookies?raw"
+              consul-template -template "/tmp/tpl.yml:/app/config/config.yml" -template "/tmp/tpl-cookies.yml:/app/config/yt-cookies.txt" -once
       containers:
         - name: core
           image: lifegoeson34/be-lingocast-core-service:latest
