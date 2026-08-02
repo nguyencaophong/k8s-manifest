@@ -69,6 +69,13 @@ spec:
               pip install --quiet --target=/tmp/extra-pylibs flask
               export PYTHONPATH="/tmp/extra-pylibs:${PYTHONPATH}"
               exec python -m workers.asr_worker
+          env:
+            # site-packages is owned by root (mode 755); appuser can't write numba's
+            # JIT cache next to librosa's source files there, which crashes librosa
+            # import with "cannot cache function ... no locator available". Redirect
+            # the cache to a dir appuser actually owns.
+            - name: NUMBA_CACHE_DIR
+              value: "/tmp/numba_cache"
           resources:
             # cpu request kept minimal - node has almost no headroom (98% of 4 vCPU
             # already requested by other workloads). Limit stays high so it can
