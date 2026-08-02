@@ -65,7 +65,6 @@ spec:
           volumeMounts:
             - name: config-output
               mountPath: /app/config
-              readOnly: true
           command: ["/bin/sh", "-c", "exec ./main"]
       volumes:
         - name: config-output
