@@ -56,6 +56,10 @@ spec:
           image: lifegoeson34/voice-analyze-and-summarizer-asr:latest
           # workers/dialog_worker.py reads os.getenv() directly (no load_dotenv()), so
           # /app/.env must be sourced into real env vars before exec.
+          # TEMP WORKAROUND: image ships NumPy 2.x but torch/whisper were compiled
+          # against NumPy 1.x's ABI, so torch.from_numpy() raises "Numpy is not
+          # available" on every transcription. Shadow it with numpy<2 via PYTHONPATH
+          # until the image is rebuilt with a pinned requirements.txt.
           command:
             - /bin/sh
             - -c
@@ -63,6 +67,8 @@ spec:
               set -a
               . /app/.env
               set +a
+              pip install --quiet --target=/tmp/extra-pylibs 'numpy<2'
+              export PYTHONPATH="/tmp/extra-pylibs:${PYTHONPATH}"
               exec python3 -m workers.dialog_worker
           resources:
             # cpu request kept minimal - node has almost no headroom (98% of 4 vCPU

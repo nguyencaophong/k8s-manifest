@@ -8,8 +8,8 @@ MONGO_URI={{ .Data.data.mongodb_uri }}
 KAFKA_BOOTSTRAP_SERVERS=techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092
 KAFKA_VIDEO_READY=production.video.ready
 KAFKA_TRANSCRIPTION_REQUESTS=audio-transcription-requests
-KAFKA_TRANSCRIPTION_RESULTS=audio-transcription-results
-KAFKA_DIALOG_RESULTS=meeting-dialog-results
+KAFKA_TRANSCRIPTION_RESULTS=audio-transcription-requests
+KAFKA_DIALOG_RESULTS=local.video.transcribed
 KAFKA_SUMMARIES=meeting-summaries
 
 MINIO_ENDPOINT=minio.techinsight.svc.cluster.local:9000
