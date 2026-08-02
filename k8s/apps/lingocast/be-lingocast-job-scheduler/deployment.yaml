@@ -52,6 +52,7 @@ spec:
               wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/lingocast/templates/be-lingocast-job-scheduler?raw"
               wget -qO /tmp/tpl-cookies.yml "${CONSUL_HTTP_ADDR}/v1/kv/lingocast/templates/be-lingocast-job-scheduler-yt-cookies?raw"
               consul-template -template "/tmp/tpl.yml:/app/config/config.yaml" -template "/tmp/tpl-cookies.yml:/app/config/yt-cookies.txt" -once
+              chmod 666 /app/config/config.yaml /app/config/yt-cookies.txt
       containers:
         - name: job-scheduler
           image: lifegoeson34/be-lingocast-job-scheduler:latest
