@@ -57,11 +57,14 @@ spec:
           image: lifegoeson34/be-lingocast-job-scheduler:latest
           resources:
             requests:
-              memory: "64Mi"
+              memory: "128Mi"
               cpu: "25m"
             limits:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "200m"
+          env:
+            - name: YTDLP_COOKIES_FILE
+              value: "/app/config/yt-cookies.txt"
           volumeMounts:
             - name: config-output
               mountPath: /app/config
