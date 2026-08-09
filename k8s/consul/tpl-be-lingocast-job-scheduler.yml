@@ -5,6 +5,7 @@ app:
   environment: "production"
   debug: true
   ytdlp_cookies_file: "/app/config/yt-cookies.txt"
+  storage_source: "minio"
 
 mongodb:
   uri: "{{ .Data.data.mongodb_uri }}"
@@ -60,6 +61,17 @@ minio:
   secret_key: "{{ .Data.data.minio_secret_key }}"
   bucket: "lingocast"
   use_ssl: false
+  public_url: "https://minio.techinsightsworld.com"
+
+# Credentials ready; storage_source is still "minio" so this is standby until
+# storage_source is switched to "r2".
+r2:
+  enable: true
+  endpoint: "{{ .Data.data.r2_endpoint }}"
+  access_key: "{{ .Data.data.r2_access_key }}"
+  secret_key: "{{ .Data.data.r2_secret_key }}"
+  bucket: "{{ .Data.data.r2_bucket }}"
+  region: "auto"
 
 asynq:
   concurrency: 10
