@@ -61,7 +61,7 @@ minio:
   secret_key: "{{ .Data.data.minio_secret_key }}"
   bucket: "lingocast"
   use_ssl: false
-  public_url: "https://minio.techinsightsworld.com"
+  public_url: "minio.techinsightsworld.com"
 
 # Credentials ready; storage_source is still "minio" so this is standby until
 # storage_source is switched to "r2".
