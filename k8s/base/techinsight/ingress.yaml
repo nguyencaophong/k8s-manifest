@@ -18,6 +18,7 @@ spec:
         - api.techinsightsworld.com
         - admin.techinsightsworld.com
         - minio.techinsightsworld.com
+        - minio-console.techinsightsworld.com
         - kibana.techinsightsworld.com
         - redpanda.techinsightsworld.com
         - jenkins.techinsightsworld.com
@@ -85,6 +86,16 @@ spec:
                 name: minio
                 port:
                   number: 9000
+    - host: minio-console.techinsightsworld.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio
+                port:
+                  number: 9001
     - host: kibana.techinsightsworld.com
       http:
         paths:

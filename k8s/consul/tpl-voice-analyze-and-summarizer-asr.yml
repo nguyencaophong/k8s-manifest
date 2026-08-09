@@ -7,16 +7,26 @@ MONGO_URI={{ .Data.data.mongodb_uri }}
 
 KAFKA_BOOTSTRAP_SERVERS=techinsight-kafka-kafka-bootstrap.techinsight.svc.cluster.local:9092
 KAFKA_VIDEO_READY=production.video.ready
+KAFKA_VIDEO_PROCESSING_STATUS=production.video.processing.status
 KAFKA_TRANSCRIPTION_REQUESTS=audio-transcription-requests
 KAFKA_TRANSCRIPTION_RESULTS=audio-transcription-requests
 KAFKA_DIALOG_RESULTS=production.video.transcribed
 KAFKA_SUMMARIES=meeting-summaries
+
+STORAGE_SOURCE=minio
 
 MINIO_ENDPOINT=minio.techinsight.svc.cluster.local:9000
 MINIO_ACCESS_KEY={{ .Data.data.minio_access_key }}
 MINIO_SECRET_KEY={{ .Data.data.minio_secret_key }}
 MINIO_BUCKET=lingocast
 MINIO_SECURE=false
+
+# Credentials ready; STORAGE_SOURCE is still "minio" so this is standby until
+# switched to STORAGE_SOURCE=r2.
+R2_ENDPOINT={{ .Data.data.r2_endpoint }}
+R2_ACCESS_KEY_ID={{ .Data.data.r2_access_key }}
+R2_SECRET_KEY={{ .Data.data.r2_secret_key }}
+R2_BUCKET={{ .Data.data.r2_bucket }}
 
 CELERY_BROKER_URL={{ .Data.data.redis_url }}
 CELERY_RESULT_BACKEND={{ .Data.data.redis_url }}

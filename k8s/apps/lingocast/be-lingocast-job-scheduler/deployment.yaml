@@ -61,7 +61,7 @@ spec:
               memory: "128Mi"
               cpu: "25m"
             limits:
-              memory: "512Mi"
+              memory: "1Gi"
               cpu: "200m"
           env:
             - name: YTDLP_COOKIES_FILE
