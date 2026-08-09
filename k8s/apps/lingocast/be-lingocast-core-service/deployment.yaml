@@ -53,7 +53,7 @@ spec:
               consul-template -template "/tmp/tpl.yml:/app/config/config.yml" -once
       containers:
         - name: core
-          image: lifegoeson34/be-lingocast-core-service:latest
+          image: lifegoeson34/be-lingocast-core-service@sha256:56dc77b1b734760bf1506c64817ed68889fb88297e5ad9b3c3916b101c017668
           resources:
             requests:
               memory: "128Mi"
