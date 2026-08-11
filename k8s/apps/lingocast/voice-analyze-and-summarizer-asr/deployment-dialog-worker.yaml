@@ -6,7 +6,7 @@ metadata:
   labels:
     app: voice-analyze-and-summarizer-asr-dialog-worker
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: voice-analyze-and-summarizer-asr-dialog-worker
