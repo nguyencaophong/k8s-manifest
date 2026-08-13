@@ -1,5 +1,7 @@
-# ArgoCD Image Updater - watches DockerHub for git-<sha> tags pushed by Jenkins
-# allowTags: regexp:^git- matches tags like git-abc1234
+# ArgoCD Image Updater - watches DockerHub for v1.0.<sha> tags pushed by CI
+# allowTags: regexp:^v1\.0\. matches tags like v1.0.abc1234
+# (CI switched from git-<sha> to v1.0.<sha> around 2026-04-30; verified against
+# actual DockerHub tags on 2026-08-13 — no service publishes git-<sha> anymore)
 ---
 # MCP Server (uses :latest tag — digest strategy detects new pushes)
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
@@ -12,12 +14,11 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: digest
-    allowTags: "latest"
   applicationRefs:
     - namePattern: internal-mcp-server
       images:
         - alias: mcp-server
-          imageName: lifegoeson34/mcp-server
+          imageName: lifegoeson34/mcp-server:latest
           manifestTargets:
             kustomize:
               name: lifegoeson34/mcp-server
@@ -33,7 +34,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-auth-service
       images:
@@ -54,7 +55,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-user-service
       images:
@@ -75,7 +76,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-core-service
       images:
@@ -96,7 +97,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-upload-service
       images:
@@ -117,7 +118,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-chat-service
       images:
@@ -138,7 +139,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-api
       images:
@@ -159,7 +160,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-ingest
       images:
@@ -180,7 +181,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-ws-gateway
       images:
@@ -201,7 +202,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-worker-dispatch
       images:
@@ -222,7 +223,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: modami-be-modami-noti-service-worker-push
       images:
@@ -243,7 +244,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: lingocast-be-lingocast-core-service
       images:
@@ -264,7 +265,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: lingocast-be-lingocast-job-scheduler
       images:
@@ -285,7 +286,7 @@ spec:
     method: argocd
   commonUpdateSettings:
     updateStrategy: newest-build
-    allowTags: "regexp:^git-"
+    allowTags: "regexp:^v1\\.0\\."
   applicationRefs:
     - namePattern: lingocast-voice-analyze-and-summarizer-asr
       images:
@@ -299,8 +300,3 @@ spec:
           manifestTargets:
             kustomize:
               name: lifegoeson34/asr-worker
-        - alias: dialog-worker
-          imageName: lifegoeson34/dialog-worker
-          manifestTargets:
-            kustomize:
-              name: lifegoeson34/dialog-worker
