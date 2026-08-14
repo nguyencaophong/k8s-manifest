@@ -276,6 +276,10 @@ spec:
               name: lifegoeson34/be-lingocast-job-scheduler
 ---
 # Lingocast Voice Analyze & Summarizer ASR (Python)
+# Uses digest strategy on :latest — CI's tag-naming scheme for this repo has
+# changed twice (git-<sha> -> v1.0.<sha> -> bare build id) and kept silently
+# breaking the newest-build/allowTags regex each time. Deployments here pull
+# :latest anyway, so tracking the digest behind that tag is scheme-agnostic.
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
@@ -285,18 +289,17 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: newest-build
-    allowTags: "regexp:^v1\\.0\\."
+    updateStrategy: digest
   applicationRefs:
     - namePattern: lingocast-voice-analyze-and-summarizer-asr
       images:
         - alias: asr
-          imageName: lifegoeson34/voice-analyze-and-summarizer-asr
+          imageName: lifegoeson34/voice-analyze-and-summarizer-asr:latest
           manifestTargets:
             kustomize:
               name: lifegoeson34/voice-analyze-and-summarizer-asr
         - alias: asr-worker
-          imageName: lifegoeson34/asr-worker
+          imageName: lifegoeson34/asr-worker:latest
           manifestTargets:
             kustomize:
               name: lifegoeson34/asr-worker
