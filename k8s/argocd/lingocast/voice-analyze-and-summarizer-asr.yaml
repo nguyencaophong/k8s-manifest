@@ -5,6 +5,10 @@ metadata:
   namespace: argocd
   labels:
     app.kubernetes.io/part-of: lingocast
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: asr-worker=lifegoeson34/asr-worker, dialog-worker=lifegoeson34/dialog-worker
+    argocd-image-updater.argoproj.io/asr-worker.update-strategy: digest
+    argocd-image-updater.argoproj.io/dialog-worker.update-strategy: digest
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
