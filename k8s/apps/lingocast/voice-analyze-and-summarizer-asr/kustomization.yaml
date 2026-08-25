@@ -5,3 +5,4 @@ resources:
   - deployment-asr-worker.yaml
   - deployment-dialog-worker.yaml
   - deployment-summary-worker.yaml
+  - hpa-dialog-worker.yaml
