@@ -45,6 +45,11 @@ spec:
               name: lifegoeson34/be-modami-auth-service
 ---
 # Backend User Service
+# Uses digest strategy on :latest — allowTags regexp:^v1\.0\. was resurrecting
+# v1.0.276e4f4 (pushed 2026-04-28) as "newest-build" every reconcile since CI
+# stopped publishing v1.0.* tags for this service after that; that stale build
+# has a broken down-migration and crashlooped the deployment. CI now only
+# pushes :latest, so track its digest instead (same fix already applied to ASR).
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
@@ -54,13 +59,12 @@ spec:
   writeBackConfig:
     method: argocd
   commonUpdateSettings:
-    updateStrategy: newest-build
-    allowTags: "regexp:^v1\\.0\\."
+    updateStrategy: digest
   applicationRefs:
     - namePattern: modami-be-modami-user-service
       images:
         - alias: user
-          imageName: lifegoeson34/be-modami-user-service
+          imageName: lifegoeson34/be-modami-user-service:latest
           manifestTargets:
             kustomize:
               name: lifegoeson34/be-modami-user-service

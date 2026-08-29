@@ -1,3 +1,17 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: lingocast-rate-limiting
+  namespace: lingocast
+plugin: rate-limiting
+config:
+  minute: 60
+  hour: 1000
+  limit_by: ip
+  policy: local
+  fault_tolerant: true
+  hide_client_headers: false
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -6,6 +20,7 @@ metadata:
   annotations:
     konghq.com/strip-path: "false"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    konghq.com/plugins: lingocast-rate-limiting
 spec:
   ingressClassName: kong
   tls:
