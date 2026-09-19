@@ -5,24 +5,45 @@
   "grpc_api_port": 10000,
   "health": true,
   "log_level": "info",
+  "granular_proxy_mode": true,
   "token_hmac_secret_key": "{{ .Data.data.token_hmac_secret_key }}",
   "api_key": "{{ .Data.data.api_key }}",
   "admin": true,
   "admin_password": "{{ .Data.data.admin_password }}",
   "admin_secret": "{{ .Data.data.admin_secret }}",
+  "proxies": [
+    {
+      "name": "noti-subscribe",
+      "endpoint": "http://be-modami-noti-service-ws-gateway.modami.svc.cluster.local:7072/centrifugo/subscribe",
+      "timeout": "3s"
+    },
+    {
+      "name": "noti-publish",
+      "endpoint": "http://be-modami-noti-service-ws-gateway.modami.svc.cluster.local:7072/centrifugo/publish",
+      "timeout": "3s"
+    },
+    {
+      "name": "chat-subscribe",
+      "endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/subscribe",
+      "timeout": "3s"
+    },
+    {
+      "name": "chat-publish",
+      "endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/publish",
+      "timeout": "3s"
+    }
+  ],
   "namespaces": [
     {
       "name": "noti",
       "presence": false,
       "history_size": 20,
       "history_ttl": "168h",
-      "recover": true,
+      "force_recovery": true,
       "proxy_subscribe": true,
-      "proxy_subscribe_endpoint": "http://localhost:7072/centrifugo/subscribe",
-      "proxy_subscribe_timeout": "3s",
+      "subscribe_proxy_name": "noti-subscribe",
       "proxy_publish": true,
-      "proxy_publish_endpoint": "http://localhost:7072/centrifugo/publish",
-      "proxy_publish_timeout": "3s"
+      "publish_proxy_name": "noti-publish"
     },
     {
       "name": "chat",
@@ -30,13 +51,11 @@
       "join_leave": true,
       "history_size": 100,
       "history_ttl": "24h",
-      "recover": true,
+      "force_recovery": true,
       "proxy_subscribe": true,
-      "proxy_subscribe_endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/subscribe",
-      "proxy_subscribe_timeout": "3s",
+      "subscribe_proxy_name": "chat-subscribe",
       "proxy_publish": true,
-      "proxy_publish_endpoint": "http://localhost:CHAT_GATEWAY_PORT/centrifugo/publish",
-      "proxy_publish_timeout": "3s"
+      "publish_proxy_name": "chat-publish"
     }
   ]
 }
