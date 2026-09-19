@@ -6,7 +6,7 @@ metadata:
   labels:
     app: be-modami-noti-service-worker-push
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: be-modami-noti-service-worker-push
@@ -50,7 +50,8 @@ spec:
               export VAULT_ADDR="${VAULT_ADDR:-http://vault.vault.svc.cluster.local:8200}"
               if [ -f /vault/secrets/token ]; then export VAULT_TOKEN=$(cat /vault/secrets/token); elif [ -f /vault/secrets/.vault-token ]; then export VAULT_TOKEN=$(cat /vault/secrets/.vault-token); fi
               wget -qO /tmp/tpl.yml "${CONSUL_HTTP_ADDR}/v1/kv/modami/templates/be-modami-noti-service?raw"
-              consul-template -template "/tmp/tpl.yml:/app/config/config.yaml" -once
+              printf '%s' '{{- with secret "secret/data/modami/be-modami-noti-service" }}{{ .Data.data.fcm_credentials_json }}{{- end }}' > /tmp/fcm.tpl
+              consul-template -template "/tmp/tpl.yml:/app/config/config.yaml" -template "/tmp/fcm.tpl:/app/config/fcm-credentials.json" -once
       containers:
         - name: noti-worker-push
           image: lifegoeson34/be-modami-noti-service-worker-push:latest
